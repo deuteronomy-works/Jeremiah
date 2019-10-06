@@ -19,8 +19,10 @@ ApplicationWindow {
     }
 
     signal spacePressed(string full_text, string curr_char, string line, int cur_pos, var ln_breaks)
-    signal enterPressed(string full_text, string curr_char, string line, int cur_pos, var ln_breaks)
+    signal enterPressed(string full_text,int cur_pos)
     signal charPressed(string full_text, string curr_char, string line, int cur_pos, var ln_breaks)
+    signal backspacePressed(string some_text, int cur_pos)
+    signal tabPressed(string some_text, int cur_pos, bool pure)
     signal mousePressed(int cur_pos)
 
     property QtObject textComp
@@ -28,20 +30,31 @@ ApplicationWindow {
     property var breaks: []
     property string words: ""
     property string prop_text: ""
+    property int tab_width: 0
+
+    // FileSystem
+    property string file_name: ""
+    property url cwd
 
     onSpacePressed: {
         Connector.pressed_space(full_text, curr_char, line, cur_pos, ln_breaks)
     }
 
     onEnterPressed: {
-        textComp.append('<br/>')
-        var num = textComp.cursorPosition - 1
-        breaks.push(num)
-        Connector.pressed_enter(full_text, curr_char, line, cur_pos, ln_breaks)
+        breaks.push(textComp.cursorPosition)
+        Connector.pressed_enter(full_text, cur_pos)
     }
 
     onCharPressed: {
         Connector.pressed_char(full_text, curr_char, line, cur_pos, ln_breaks)
+    }
+
+    onBackspacePressed: {
+        Connector.pressed_backspace(some_text, cur_pos)
+    }
+
+    onTabPressed: {
+        Connector.pressed_tab(some_text, cur_pos, pure)
     }
 
     onMousePressed: {
@@ -277,6 +290,23 @@ ApplicationWindow {
         onSendCoOrd: {
             var ret = returnCoOrd
             prop_text = "Line: " + ret[0] + ", Col: " + ret[1]
+        }
+
+        onEnter_return: {
+            var ret = return_enter
+            textComp.insert(textComp.cursorPosition, ret)
+            Connector.wake_enter_up(textComp.getText(0, textComp.length), textComp.cursorPosition, breaks)
+        }
+
+        onBackspace_return: {
+            var ret = return_backspace
+            textComp.remove(ret[0], ret[1])
+            Connector.wake_enter_up(textComp.getText(0, textComp.length), textComp.cursorPosition, breaks)
+        }
+
+        onBacktab_return: {
+            var ret = return_backtab
+            textComp.remove(ret[0], ret[1])
         }
 
         onWakeUp: {

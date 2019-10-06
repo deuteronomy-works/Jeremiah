@@ -66,7 +66,6 @@ Component {
                 selectedTextColor: "white"
                 selectionColor: "indigo"
                 textFormat: TextEdit.RichText
-                tabStopDistance: 4
                 //text: ""
 
                 property string raw_text
@@ -99,14 +98,29 @@ Component {
 
                 }
 
+                Keys.onReturnPressed: {
 
-                /*Keys.onReturnPressed: {
-                    enterPressed(tSpace.getText(0, tSpace.length), '<br/>',  tSpace.lineCount, tSpace.cursorPosition, breaks)
-                }*/
+                    enterPressed(tSpace.getText(0, tSpace.cursorPosition), tSpace.cursorPosition);
+                }
 
                 /*Keys.onEnterPressed: {
                     enterPressed(tSpace.getText(0, tSpace.length), '<br/>',  tSpace.lineCount, tSpace.cursorPosition, breaks)
                 }*/
+
+                Keys.onTabPressed: {
+                    tabPressed('{', tSpace.cursorPosition, true)
+                }
+
+                Keys.onBacktabPressed: {
+                    tabPressed(tSpace.getText(0, tSpace.cursorPosition), tSpace.cursorPosition, false)
+                    return
+                }
+
+                Keys.onPressed: {
+                    if(event.key === Qt.Key_Backspace) {
+                        backspacePressed(tSpace.getText(0, tSpace.cursorPosition), tSpace.cursorPosition)
+                    }
+                }
 
                 Keys.onReleased: {
 
