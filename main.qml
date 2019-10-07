@@ -18,6 +18,7 @@ ApplicationWindow {
         Connector.startUp()
     }
 
+    // Editor
     signal spacePressed(string full_text, string curr_char, string line, int cur_pos, var ln_breaks)
     signal enterPressed(string full_text,int cur_pos)
     signal charPressed(string full_text, string curr_char, string line, int cur_pos, var ln_breaks)
@@ -25,6 +26,14 @@ ApplicationWindow {
     signal tabPressed(string some_text, int cur_pos, bool pure)
     signal mousePressed(int cur_pos)
 
+    // FileSystem
+    signal saveBtnPressed(string fulltext)
+    signal save(string filename)
+
+    // Application
+    property int current_tab: 0
+
+    // Editor
     property QtObject textComp
     property string word
     property var breaks: []
@@ -33,9 +42,12 @@ ApplicationWindow {
     property int tab_width: 0
 
     // FileSystem
-    property string file_name: ""
+    property var file_names: [""]
     property url cwd
+    property bool saved: false
+    property string full_text
 
+    // Editor
     onSpacePressed: {
         Connector.pressed_space(full_text, curr_char, line, cur_pos, ln_breaks)
     }
@@ -59,6 +71,22 @@ ApplicationWindow {
 
     onMousePressed: {
         Connector.pressed_mouse(cur_pos)
+    }
+
+    // FileSystem
+    onSaveBtnPressed: {
+        full_text = fulltext
+        var filename = file_names[current_tab]
+        if (filename === "") {
+            s_Dialog.open()
+        } else {
+            save(filename)
+        }
+    }
+
+    onSave: {
+        saved = true
+        Connector.save_file(filename, full_text)
     }
 
     FontLoader {
@@ -104,6 +132,13 @@ ApplicationWindow {
                 Menu {
                     title: qsTr("File")
                     Action { text: qsTr("File") }
+
+                    Action {
+                        text: qsTr("&Save")
+
+                        onTriggered: saveBtnPressed('')
+
+                    }
                 }
                 Menu {
                     title: qsTr("Edit")
@@ -279,6 +314,8 @@ ApplicationWindow {
         }
 
     }
+
+    Comp.SaveDialog { id: s_Dialog }
 
     Connections {
         target: Connector
