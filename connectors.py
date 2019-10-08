@@ -32,26 +32,7 @@ class Connector(QObject, Editor, Fs):
     backtab_return = pyqtSignal(list, arguments=["return_backtab"])
     sendCoOrd = pyqtSignal(list, arguments=["returnCoOrd"])
     wakeUp = pyqtSignal(str, arguments=["_pressed_mouse"])
-
-    @pyqtSlot()
-    def startUp(self):
-        with open('base_styles.html', mode='r', encoding='ascii') as base_html:
-            data = base_html.read()
-        self.send_base_html.emit(data)
-
-    @pyqtSlot(str, str)
-    def save_file(self, filename, full_text):
-        f_thread = threading.Thread(target=self._save_file,
-                                    args=[filename, full_text])
-        f_thread.daemon = True
-        f_thread.start()
-
-    @pyqtSlot(str)
-    def read_file(self, filename):
-        f_thread = threading.Thread(target=self._read_file,
-                                    args=[filename])
-        f_thread.daemon = True
-        f_thread.start()
+    completedProcess = pyqtSignal(str, arguments=["return_completed"])
 
     @pyqtSlot(str, int)
     def pressed_enter(self, full_text, cur_pos):
@@ -98,6 +79,30 @@ class Connector(QObject, Editor, Fs):
         p_thread.daemon = True
         p_thread.start()
 
+    @pyqtSlot(str)
+    def read_file(self, filename):
+        f_thread = threading.Thread(target=self._read_file,
+                                    args=[filename])
+        f_thread.daemon = True
+        f_thread.start()
+
+    @pyqtSlot(str, str)
+    def save_file(self, filename, full_text):
+        f_thread = threading.Thread(target=self._save_file,
+                                    args=[filename, full_text])
+        f_thread.daemon = True
+        f_thread.start()
+
+    @pyqtSlot(str, str, int)
+    def send_text(self, full_text, line, cur_pos):
+        pass
+
+    @pyqtSlot()
+    def startUp(self):
+        with open('base_styles.html', mode='r', encoding='ascii') as base_html:
+            data = base_html.read()
+        self.send_base_html.emit(data)
+
     @pyqtSlot(int)
     def wake_me_up(self, cur_pos):
         m_thread = threading.Thread(target=self._wake_me_up,
@@ -112,8 +117,6 @@ class Connector(QObject, Editor, Fs):
         m_thread.daemon = True
         m_thread.start()
 
-    @pyqtSlot(str, str, int)
-    def send_text(self, full_text, line, cur_pos):
-        pass
+    
 
 

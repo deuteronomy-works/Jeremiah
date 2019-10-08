@@ -85,7 +85,6 @@ ApplicationWindow {
     }
 
     onSave: {
-        saved = true
         Connector.save_file(filename, full_text)
     }
 
@@ -136,7 +135,7 @@ ApplicationWindow {
                     Action {
                         text: qsTr("&Save")
 
-                        onTriggered: saveBtnPressed('')
+                        onTriggered: saveBtnPressed(textComp.getText(0, textComp.length))
 
                     }
                 }
@@ -349,6 +348,13 @@ ApplicationWindow {
         onWakeUp: {
             var ret = _pressed_mouse
             Connector.wake_me_up(textComp.cursorPosition)
+        }
+
+        onCompletedProcess: {
+            var ret = return_completed
+            if(ret === "save") {
+                saved = true
+            }
         }
 
     }
