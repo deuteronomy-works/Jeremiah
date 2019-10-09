@@ -18,6 +18,13 @@ ApplicationWindow {
         Connector.startUp()
     }
 
+    // Application
+    signal createNewTab()
+
+    onCreateNewTab: {
+        //
+    }
+
     // Editor
     signal spacePressed(string full_text, string curr_char, string line, int cur_pos, var ln_breaks)
     signal enterPressed(string full_text,int cur_pos)

@@ -117,6 +117,5 @@ class Connector(QObject, Editor, Fs):
         m_thread.daemon = True
         m_thread.start()
 
-    
 
 

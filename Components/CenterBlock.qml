@@ -1,10 +1,13 @@
 import QtQuick 2.10
 import QtQuick.Controls 2.3
 import QtQuick.Layouts 1.3
-import "customs"
+import "customs" as Cust
 
 Rectangle {
+    id: ideal
     color: "transparent"
+
+    property QtObject ttc
 
     ColumnLayout {
 
@@ -47,12 +50,20 @@ Rectangle {
 
                     }
 
-                    CustTabButton {
+                    Cust.CustTabButton {
                         text: qsTr("First layout")
+
+                        onClicked: {
+                            tv.currentIndex = 0
+                        }
                     }
 
-                    CustTabButton {
-                        text: qsTr("Second layout")
+                    Cust.CustTabButton {
+                        text: qsTr("add layout")
+
+                        onClicked: {
+                            tv.addChild("../TextComponent.qml", tbar, tv)
+                        }
                     }
 
                 }
@@ -60,15 +71,18 @@ Rectangle {
             }
 
             // the view
-            StackView {
+            Cust.CustTabView {
+                id: tv
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                initialItem: textComponent
-           }
 
-           // Components
-           BlankComponent { id: blankComponent }
-           TextComponent { id: textComponent }
+                Rectangle {
+                    property int index: 0
+                    anchors.fill: parent
+                    color: "dodgerblue"
+                }
+
+           }
 
         }
 
