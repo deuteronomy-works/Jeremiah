@@ -22,7 +22,7 @@ ApplicationWindow {
     signal createNewTab()
 
     onCreateNewTab: {
-        //
+        tab_view.addChild('../TextComponent.qml', tab_bar, 'tv')
     }
 
     // Editor
@@ -39,6 +39,9 @@ ApplicationWindow {
 
     // Application
     property int current_tab: 0
+    property QtObject tab_view
+    property QtObject tab_bar
+    property var tab_headers: ["", ""]
 
     // Editor
     property QtObject textComp

@@ -38,7 +38,12 @@ Rectangle {
             MenuBar {
                 Menu {
                     title: qsTr("File")
-                    Action { text: qsTr("File") }
+                    Action {
+                        text: qsTr("File")
+
+                        onTriggered: createNewTab()
+
+                    }
 
                     Action {
                         text: qsTr("&Save")

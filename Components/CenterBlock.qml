@@ -32,6 +32,8 @@ Rectangle {
                     width: parent.width
                     height: parent.height
 
+                    Component.onCompleted: tab_bar = this
+
                     ButtonGroup {
                         buttons: tbar.children
 
@@ -58,14 +60,6 @@ Rectangle {
                         }
                     }
 
-                    Cust.CustTabButton {
-                        text: qsTr("add layout")
-
-                        onClicked: {
-                            tv.addChild("../TextComponent.qml", tbar, tv)
-                        }
-                    }
-
                 }
 
             }
@@ -76,7 +70,9 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                Rectangle {
+                Component.onCompleted: tab_view = this
+
+                TextComponent {
                     property int index: 0
                     anchors.fill: parent
                     color: "dodgerblue"

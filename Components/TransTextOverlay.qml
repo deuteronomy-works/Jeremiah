@@ -7,6 +7,7 @@ Rectangle {
     width: parent.width
     height: parent.height
     color: "transparent"
+    visible: false
 
     Rectangle {
         x: 200
