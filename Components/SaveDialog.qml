@@ -10,6 +10,7 @@ FileDialog {
     //folder: ""
 
     onAccepted: {
+        updateList(current_tab, dial.fileUrl)
         save(dial.fileUrl)
     }
 

@@ -20,7 +20,7 @@ ApplicationWindow {
 
     // Application
     signal createNewTab()
-    signal updateList(var list_name)
+    signal updateList(int ind, string value)
 
     onCreateNewTab: {
         tab_view.addChild('../TextComponent.qml', tab_bar, 'tv')
@@ -29,7 +29,12 @@ ApplicationWindow {
     }
 
     onUpdateList: {
-        console.log('list:' + list_name)
+        tab_headers[ind] = value
+        var headers = tab_headers
+        tab_headers = new Object(headers)
+        file_names[ind] = value
+        var files = file_names
+        file_names = new Object(file_names)
     }
 
     // Editor
@@ -94,7 +99,9 @@ ApplicationWindow {
     onSaveBtnPressed: {
         full_text = fulltext
         var filename = file_names[current_tab]
-        if (filename === "") {
+        print('..' + filename)
+        if (filename === "Untitled") {
+            print('dialog')
             s_Dialog.open()
         } else {
             save(filename)
@@ -102,6 +109,7 @@ ApplicationWindow {
     }
 
     onSave: {
+        return
         Connector.save_file(filename, full_text)
     }
 

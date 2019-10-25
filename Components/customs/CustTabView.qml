@@ -30,7 +30,9 @@ Rectangle {
             comp.statusChanged.connect(finiCreate)
         }
 
-        var ss = 'import QtQuick 2.10; CustTabButton{text: qsTr(tab_headers['+ ind +']); onClicked: {'+ tv_id +'.currentIndex=' + ind +' }}'
+        print('ind: ', ind)
+
+        var ss = 'import QtQuick 2.10; CustTabButton{text: qsTr(tab_headers['+ ind +']); onClicked: {current_tab = '+ ind +' ;' + tv_id +'.currentIndex=' + ind +' }}'
         var btnc = Qt.createQmlObject(ss, tab_id)
     }
 

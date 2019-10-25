@@ -56,6 +56,7 @@ Rectangle {
                         text: qsTr(tab_headers[0])
 
                         onClicked: {
+                            current_tab = 0
                             tv.currentIndex = 0
                         }
                     }
