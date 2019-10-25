@@ -10,7 +10,11 @@ FileDialog {
     //folder: ""
 
     onAccepted: {
-        updateList(current_tab, dial.fileUrl)
+        var full = dial.fileUrl.toString()
+        var splits = full.split('/')
+        var filename = splits[splits.length - 1]
+        updateList(0, current_tab, filename)
+        updateList(1, current_tab, dial.fileUrl)
         save(dial.fileUrl)
     }
 

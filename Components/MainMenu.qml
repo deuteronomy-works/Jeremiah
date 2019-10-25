@@ -49,7 +49,6 @@ Rectangle {
                         text: qsTr("&Save")
 
                         onTriggered: {
-                            console.log('sd')
                             saveBtnPressed(textComp[current_tab].getText(0, textComp[current_tab].length))
                         }
 
