@@ -17,6 +17,10 @@ Rectangle {
         }
 
         var ind = basev.count
+        // Add to filename and file headers
+        file_names.push("Untitled")
+        tab_headers.push("Untitled")
+
         mComp = Qt.createQmlObject('import QtQuick 2.10; Rectangle {property int index:' + ind +';anchors.fill: parent; color: "transparent"; visible: index == parent.currentIndex;}', basev)
         basev.count += 1
         comp = Qt.createComponent(ur_l)
@@ -25,10 +29,6 @@ Rectangle {
         } else {
             comp.statusChanged.connect(finiCreate)
         }
-
-        // Add to filename and file headers
-        file_names.push("Untitled")
-        tab_headers.push("Untitled")
 
         var ss = 'import QtQuick 2.10; CustTabButton{text: qsTr(tab_headers['+ ind +']); onClicked: {'+ tv_id +'.currentIndex=' + ind +' }}'
         var btnc = Qt.createQmlObject(ss, tab_id)

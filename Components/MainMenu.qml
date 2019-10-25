@@ -48,7 +48,9 @@ Rectangle {
                     Action {
                         text: qsTr("&Save")
 
-                        onTriggered: saveBtnPressed(textComp.getText(0, textComp.length))
+                        onTriggered: {
+                            saveBtnPressed(textComp[current_tab].getText(0, textComp[current_tab].length))
+                        }
 
                     }
                 }

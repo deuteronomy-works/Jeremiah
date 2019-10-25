@@ -48,10 +48,10 @@ ApplicationWindow {
     property int current_tab: 0
     property QtObject tab_view
     property QtObject tab_bar
+    property var textComp: []
     property var tab_headers: ["First Layout"]
 
     // Editor
-    property QtObject textComp
     property string word
     property var breaks: []
     property string words: ""

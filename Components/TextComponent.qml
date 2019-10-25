@@ -71,7 +71,9 @@ Rectangle {
             property string raw_text
             property int curr_tabs: 0
 
-            //Component.onCompleted: textComp = this;
+            Component.onCompleted: {
+                textComp[tab_headers.length - 1] = this;
+            }
 
             background: Rectangle {
                 //color: "dodgerblue"
