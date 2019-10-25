@@ -26,7 +26,11 @@ Rectangle {
             comp.statusChanged.connect(finiCreate)
         }
 
-        var ss = 'import QtQuick 2.10; CustTabButton{text: qsTr("Untitled"); onClicked: {'+ tv_id +'.currentIndex=' + ind +' }}'
+        // Add to filename and file headers
+        file_names.push("Untitled")
+        tab_headers.push("Untitled")
+
+        var ss = 'import QtQuick 2.10; CustTabButton{text: qsTr(tab_headers['+ ind +']); onClicked: {'+ tv_id +'.currentIndex=' + ind +' }}'
         var btnc = Qt.createQmlObject(ss, tab_id)
     }
 

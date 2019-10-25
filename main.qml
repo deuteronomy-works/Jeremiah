@@ -20,9 +20,16 @@ ApplicationWindow {
 
     // Application
     signal createNewTab()
+    signal updateList(var list_name)
 
     onCreateNewTab: {
         tab_view.addChild('../TextComponent.qml', tab_bar, 'tv')
+        updateList(tab_headers)
+        updateList(file_names)
+    }
+
+    onUpdateList: {
+        console.log('list:' + list_name)
     }
 
     // Editor
@@ -41,7 +48,7 @@ ApplicationWindow {
     property int current_tab: 0
     property QtObject tab_view
     property QtObject tab_bar
-    property var tab_headers: ["", ""]
+    property var tab_headers: ["First Layout"]
 
     // Editor
     property QtObject textComp
@@ -52,7 +59,7 @@ ApplicationWindow {
     property int tab_width: 0
 
     // FileSystem
-    property var file_names: [""]
+    property var file_names: ["First Layout"]
     property url cwd
     property bool saved: false
     property string full_text

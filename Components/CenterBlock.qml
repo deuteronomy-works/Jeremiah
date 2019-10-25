@@ -53,7 +53,7 @@ Rectangle {
                     }
 
                     Cust.CustTabButton {
-                        text: qsTr("First layout")
+                        text: qsTr(tab_headers[0])
 
                         onClicked: {
                             tv.currentIndex = 0
