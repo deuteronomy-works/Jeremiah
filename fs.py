@@ -11,7 +11,7 @@ class Fs():
 
 
     content_replaces = ["\u2029", "&nbsp;"]
-    cont_repls = {"\u2029": "\n", "&nbsp;": " "}
+    cont_repls = {"\u2029": "\r\n", "&nbsp;": " "}
 
     def return_completed(self, kind):
         self.completedProcess.emit(kind)
