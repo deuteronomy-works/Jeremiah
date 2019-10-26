@@ -27,22 +27,25 @@ ApplicationWindow {
     }
 
     onUpdateList: {
+        var headers
+        var files
+
         if(pos == 0) {
             tab_headers[ind] = value
-            var headers = tab_headers
+            headers = tab_headers
             tab_headers = new Object(headers)
         } else if(pos == 1) {
             file_names[ind] = value
-            var files = file_names
+            files = file_names
             file_names = new Object(file_names)
         }
 
         if(pos == 2) {
             tab_headers[ind] = value
-            var headers = tab_headers
+            headers = tab_headers
             tab_headers = new Object(headers)
             file_names[ind] = value
-            var files = file_names
+            files = file_names
             file_names = new Object(file_names)
         }
 
@@ -118,7 +121,6 @@ ApplicationWindow {
     }
 
     onSave: {
-        return
         Connector.save_file(filename, full_text)
     }
 
@@ -281,24 +283,26 @@ ApplicationWindow {
 
         onEnter_return: {
             var ret = return_enter
-            textComp.insert(textComp.cursorPosition, ret)
-            Connector.wake_enter_up(textComp.getText(0, textComp.length), textComp.cursorPosition, breaks)
+            var tComp = textComp[current_tab]
+            tComp.insert(tComp.cursorPosition, ret)
+            Connector.wake_enter_up(tComp.getText(0, tComp.length), tComp.cursorPosition, breaks)
         }
 
         onBackspace_return: {
             var ret = return_backspace
-            textComp.remove(ret[0], ret[1])
-            Connector.wake_enter_up(textComp.getText(0, textComp.length), textComp.cursorPosition, breaks)
+            var tComp = textComp[current_tab]
+            tComp.remove(ret[0], ret[1])
+            Connector.wake_enter_up(tComp.getText(0, tComp.length), tComp.cursorPosition, breaks)
         }
 
         onBacktab_return: {
             var ret = return_backtab
-            textComp.remove(ret[0], ret[1])
+            textComp[current_tab].remove(ret[0], ret[1])
         }
 
         onWakeUp: {
             var ret = _pressed_mouse
-            Connector.wake_me_up(textComp.cursorPosition)
+            Connector.wake_me_up(textComp[current_tab].cursorPosition)
         }
 
         onCompletedProcess: {
