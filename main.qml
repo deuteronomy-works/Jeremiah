@@ -20,10 +20,21 @@ ApplicationWindow {
 
     // Application
     signal createNewTab()
+    signal startNewDocument(string file_contents)
     signal updateList(int pos, int ind, string value)
 
     onCreateNewTab: {
         tab_view.addChild('../TextComponent.qml', tab_bar, 'tv')
+    }
+
+    onStartNewDocument: {
+
+        createNewTab()
+        var ind = tab_headers.length - 1
+        textComp[ind].text = file_contents
+        updateFileName(opening_file)
+        updateList(1, ind, opening_file)
+
     }
 
     onUpdateList: {
@@ -62,6 +73,7 @@ ApplicationWindow {
     // FileSystem
     signal openBtnPressed()
     signal openFile(string file)
+    signal updateFileName(string file)
     signal saveBtnPressed(string fulltext)
     signal save(string filename)
 
@@ -81,6 +93,7 @@ ApplicationWindow {
 
     // FileSystem
     property var file_names: ["First Layout"]
+    property string opening_file: ""
     property url cwd
     property bool saved: false
     property string full_text
@@ -117,7 +130,19 @@ ApplicationWindow {
     }
 
     onOpenFile: {
-        console.log('file: ' +file)
+        opening_file = file
+        Connector.read_file(file)
+    }
+
+    onUpdateFileName: {
+
+        // Update File name with real name
+
+        var ind = file_names.length - 1
+        var splits = file.split("/")
+        var last_id = splits.length - 1
+        var name = splits[last_id]
+        updateList(0, ind, name)
     }
 
     onSaveBtnPressed: {
@@ -321,6 +346,12 @@ ApplicationWindow {
             if(ret === "save") {
                 saved = true
             }
+        }
+
+        onOpenedFile: {
+            var conts = return_contents
+            // Start New Document
+            startNewDocument(conts)
         }
 
     }

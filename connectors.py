@@ -33,6 +33,7 @@ class Connector(QObject, Editor, Fs):
     sendCoOrd = pyqtSignal(list, arguments=["returnCoOrd"])
     wakeUp = pyqtSignal(str, arguments=["_pressed_mouse"])
     completedProcess = pyqtSignal(str, arguments=["return_completed"])
+    openedFile = pyqtSignal(str, arguments=['return_contents'])
 
     @pyqtSlot(str, int)
     def pressed_enter(self, full_text, cur_pos):
