@@ -46,6 +46,13 @@ Rectangle {
                     }
 
                     Action {
+                        text: qsTr("Open")
+
+                        onTriggered: openBtnPressed()
+
+                    }
+
+                    Action {
                         text: qsTr("&Save")
 
                         onTriggered: {

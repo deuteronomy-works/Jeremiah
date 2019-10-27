@@ -60,6 +60,8 @@ ApplicationWindow {
     signal mousePressed(int cur_pos)
 
     // FileSystem
+    signal openBtnPressed()
+    signal openFile(string file)
     signal saveBtnPressed(string fulltext)
     signal save(string filename)
 
@@ -110,6 +112,14 @@ ApplicationWindow {
     }
 
     // FileSystem
+    onOpenBtnPressed: {
+        o_Dialog.open()
+    }
+
+    onOpenFile: {
+        console.log('file: ' +file)
+    }
+
     onSaveBtnPressed: {
         full_text = fulltext
         var filename = file_names[current_tab]
@@ -267,6 +277,7 @@ ApplicationWindow {
 
     }
 
+    Comp.OpenDialog { id: o_Dialog }
     Comp.SaveDialog { id: s_Dialog }
 
     Connections {
