@@ -2,6 +2,7 @@
 import threading
 import re
 from time import sleep
+from vocabulary.voc import Vocabulary
 
 class Fs():
 
@@ -38,6 +39,8 @@ class Fs():
         return raw
 
     def _save_file(self, file_name, contents):
+        voc = Vocabulary(contents)
+        voc.start()
         filename =  self._clean_filename(file_name)
         cleaned = self._clean_content(contents)
         data = bytes(cleaned, 'utf-8')
