@@ -34,7 +34,6 @@ class Pyvoc():
                 line = '\u2029'
             else:
                 line += '\u2029'
-            print('l: ', line)
             splits = line.split(" ")
             word_splits.extend(splits)
         word_splits_s = word_splits
@@ -47,26 +46,23 @@ class Pyvoc():
                 pass
             elif word == "\u2029":
                 word_splits_s[no] = '\u2029'
-                print('line break')
             elif word == "":
                 word_splits_s[no] = "&nbsp;"
-                print('hey')
             else:
-                print(list(word))
                 stat = '<span style="color: red">' + word + '</span>'
                 word_splits_s[no] = stat
 
         for each in word_splits_s:
             if each == '\u2029':
-                print('ll')
                 content += '\u2029'
             elif each == '&nbsp;':
                 content += '&nbsp;'
+            elif each.endswith('\u2029</span>'):
+                content += each
             else:
                 content += each + "&nbsp;"
 
         self.content = content
-        print(self.content)
 
     def _replace(self, var):
 
@@ -77,4 +73,3 @@ class Pyvoc():
         for x in main_var:
             if x in self.content:
                 self.content = self.content.replace(x, main_dict[x])
-        print(self.content)
