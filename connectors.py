@@ -30,6 +30,7 @@ class Connector(QObject, Editor, Fs):
     char_return = pyqtSignal(str, arguments=["return_char"])
     backspace_return = pyqtSignal(list, arguments=["return_backspace"])
     backtab_return = pyqtSignal(list, arguments=["return_backtab"])
+    checkedVocab = pyqtSignal(str, arguments=["return_vocab"])
     sendCoOrd = pyqtSignal(list, arguments=["returnCoOrd"])
     wakeUp = pyqtSignal(str, arguments=["_pressed_mouse"])
     completedProcess = pyqtSignal(str, arguments=["return_completed"])

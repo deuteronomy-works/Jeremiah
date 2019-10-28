@@ -10,3 +10,5 @@ class Vocabulary():
     def start(self):
         py_voca = py_voc.Pyvoc(self.contents)
         py_checked = py_voca.start()
+
+        return py_checked
