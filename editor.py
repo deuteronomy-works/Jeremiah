@@ -136,6 +136,11 @@ class Editor():
                 char_no += 1
                 self.count[line_no].append(char_no)
 
+    def _editor_count(self, text, cur_pos):
+        breaks = []
+        self._handle_text(text, breaks)
+        self.co_ord(cur_pos)
+
     def _handle_text(self, text, breaks):
         self.counter(text, breaks)
 

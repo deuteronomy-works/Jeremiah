@@ -67,6 +67,7 @@ ApplicationWindow {
     signal backspacePressed(string some_text, int cur_pos)
     signal tabPressed(string some_text, int cur_pos, bool pure)
     signal mousePressed(int cur_pos)
+    signal count()
 
     // FileSystem
     signal openBtnPressed()
@@ -121,6 +122,12 @@ ApplicationWindow {
     onMousePressed: {
         Connector.pressed_mouse(cur_pos)
     }
+
+    onCount: {
+        var tComp = textComp[current_tab]
+        Connector.editor_count(tComp.getText(0, tComp.length), tComp.cursor_position)
+    }
+
 
     // FileSystem
     onOpenBtnPressed: {
@@ -355,6 +362,7 @@ ApplicationWindow {
         onCheckedVocab: {
             var ret = return_vocab
             textComp[current_tab].text = ret
+            count()
         }
 
     }

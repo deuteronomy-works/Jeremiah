@@ -37,6 +37,13 @@ class Connector(QObject, Editor, Fs):
     openedFile = pyqtSignal(str, arguments=['return_contents'])
 
     @pyqtSlot(str, int)
+    def editor_count(self, text, cur_pos):
+        m_thread = threading.Thread(target=self._editor_count,
+                                    args=[text, cur_pos])
+        m_thread.daemon = True
+        m_thread.start()
+
+    @pyqtSlot(str, int)
     def pressed_enter(self, full_text, cur_pos):
         f_thread = threading.Thread(target=self._pressed_enter,
                                     args=[full_text,cur_pos])
