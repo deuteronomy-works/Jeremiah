@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 import threading
-import re
 from time import sleep
 
 class Editor():
 
+
+    count = [[]]
+    tab_width = 0
+    tab_worthy = ['{', ':']
+    values = {"new_line": "\u2029", 'tab': "&nbsp;&nbsp;&nbsp;&nbsp;"}
+    curr_word = ""
+    end_new_word = False
+    lines = []
 
     def return_space(self, val):
         self.space_return.emit(val)

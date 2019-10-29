@@ -16,13 +16,6 @@ class Connector(QObject, Editor, Fs):
 
     def __init__(self):
         QObject.__init__(self)
-        self.count = [[]]
-        self.tab_width = 0
-        self.tab_worthy = ['{']
-        self.values = {"new_line": "\u2029", 'tab': "&nbsp;&nbsp;&nbsp;&nbsp;"}
-        self.curr_word = ""
-        self.end_new_word = False
-        self.lines = []
 
     send_base_html = pyqtSignal(str, arguments=["startUp"])
     space_return = pyqtSignal(str, arguments=["return_space"])
