@@ -25,14 +25,22 @@ class Pyvoc():
 
         word_splits = []
         lines_splits = self.content.split('\r\n')
+        lines_len = len(lines_splits)
+        no = -1
         for line in lines_splits:
+            no += 1
             # Find if line contains just spaces
             founds = re.findall("[A-Za-z0-9`~!@#$%^&*\(\)\[\]-{}_=+/?<,.|>]*", line)
             found = str(founds).replace(', ', '').replace("'", "")
             if found == '[]':
                 # Empty
-                line = '\u2029'
+                print('line: ', list(line))
+                if (no+1) < lines_len:
+                    line = '\u2029'
+                else:
+                    line = ''
             else:
+                print('linee: ' + line)
                 line += '\u2029'
             splits = line.split(" ")
             word_splits.extend(splits)
@@ -54,12 +62,17 @@ class Pyvoc():
 
         for each in word_splits_s:
             if each == '\u2029':
+                print('l: ' + content)
                 content += '\u2029'
+                print('d: ' + content)
             elif each == '&nbsp;':
                 content += '&nbsp;'
             elif each.endswith('\u2029</span>'):
+                print('ld: ' + content)
                 content += each
+                print('dl: ' + content)
             else:
+                print('kk: ' + each)
                 content += each + "&nbsp;"
 
         self.content = content
