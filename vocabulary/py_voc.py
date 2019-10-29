@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import re
+from types.base import base_types, base_types_dict
 
 class Pyvoc():
 
 
     def __init__(self, conts):
         self.content = conts
-        self.base_types = ['for']
-        self.base_types_dict = {'for': "<span>for</span>"}
+        self.base_types = base_types
+        self.base_types_dict = base_types_dict
         self.replace_processes = ['base']
 
     def start(self):
