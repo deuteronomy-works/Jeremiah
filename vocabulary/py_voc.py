@@ -34,13 +34,11 @@ class Pyvoc():
             found = str(founds).replace(', ', '').replace("'", "")
             if found == '[]':
                 # Empty
-                print('line: ', list(line))
                 if (no+1) < lines_len:
                     line = '\u2029'
                 else:
                     line = ''
             else:
-                print('linee: ' + line)
                 line += '\u2029'
             splits = line.split(" ")
             word_splits.extend(splits)
@@ -55,24 +53,24 @@ class Pyvoc():
             elif word == "\u2029":
                 word_splits_s[no] = '\u2029'
             elif word == "":
-                word_splits_s[no] = "&nbsp;"
+                # A space unless its the last entry
+                if (no + 1) == len(word_splits_s):
+                    # If it is the last entry probably its not a space
+                    word_splits_s.pop()
+                else:
+                    word_splits_s[no] = "&nbsp;"
             else:
                 stat = '<span style="color: red">' + word + '</span>'
                 word_splits_s[no] = stat
 
         for each in word_splits_s:
             if each == '\u2029':
-                print('l: ' + content)
                 content += '\u2029'
-                print('d: ' + content)
             elif each == '&nbsp;':
                 content += '&nbsp;'
             elif each.endswith('\u2029</span>'):
-                print('ld: ' + content)
                 content += each
-                print('dl: ' + content)
             else:
-                print('kk: ' + each)
                 content += each + "&nbsp;"
 
         self.content = content

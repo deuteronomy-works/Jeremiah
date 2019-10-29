@@ -354,7 +354,6 @@ ApplicationWindow {
 
         onCheckedVocab: {
             var ret = return_vocab
-            console.log('ret: ' + ret)
             textComp[current_tab].text = ret
         }
 
