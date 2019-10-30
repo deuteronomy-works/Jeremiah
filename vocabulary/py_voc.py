@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
-from types.base import base_types, base_types_dict
+from vocabulary.types.base import base_types, base_types_dict
 
 class Pyvoc():
 
