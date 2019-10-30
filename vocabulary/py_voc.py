@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
-from vocabulary.types.base import base_types, base_types_dict
+from vocabulary.types.base import base_types, base_types_dict, base_functions,\
+base_func_dict
 
 class Pyvoc():
 
@@ -81,7 +82,15 @@ class Pyvoc():
         if var == 'base':
             main_var = self.base_types
             main_dict = self.base_types_dict
+            main_func = base_functions
+            main_func_dict = base_func_dict
 
+        # variable replacement
         for x in main_var:
             if x in self.content:
                 self.content = self.content.replace(x, main_dict[x])
+
+        # function replacement
+        for y in main_func:
+            if y in self.content:
+                self.content = self.content.replace(y, main_func_dict[y])
