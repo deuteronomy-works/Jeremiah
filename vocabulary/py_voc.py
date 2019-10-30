@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+from vocabulary.py_user_defined import UserDefined
 from vocabulary.types.base import base_types, base_types_dict, base_functions,\
 base_func_dict
 
@@ -15,6 +16,10 @@ class Pyvoc():
 
     def start(self):
 
+        # Find user defined
+        user_def = UserDefined(self.content)
+        self.content = user_def.start()
+        
         # Replaces
         for var in self.replace_processes:
             self._replace(var)
