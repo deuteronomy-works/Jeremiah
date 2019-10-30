@@ -10,6 +10,7 @@ class Pyvoc():
         self.content = conts
         self.base_types = base_types
         self.base_types_dict = base_types_dict
+        self.operand_types = ['+', '-', '=', '/', '*']
         self.replace_processes = ['base']
 
     def start(self):
@@ -86,11 +87,24 @@ class Pyvoc():
             main_func_dict = base_func_dict
 
         # variable replacement
-        for x in main_var:
-            if x in self.content:
-                self.content = self.content.replace(x, main_dict[x])
+        self._replace_space_var(main_var, main_dict)
 
         # function replacement
         for y in main_func:
             if y in self.content:
                 self.content = self.content.replace(y, main_func_dict[y])
+
+    def _replace_space_var(self, var, var_dict):
+        splits = self.content.split(' ')
+        for x in var:
+            if x in splits:
+                ind = splits.index(x)
+                splits[ind] = var_dict[x]
+
+        # Add all to string
+        string = ""
+        for a in splits:
+            string += a + " "
+
+        # And back to contents
+        self.content = string[:-1]
