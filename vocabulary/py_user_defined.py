@@ -8,10 +8,14 @@ class UserDefined():
         self.classes_parent = {}
         self.functions_parent = {'__file__': []}
         self.functions = []
+        self.var_parent = {'__file__': []}
+        self.variables = []
+        self.curr_type = ""
 
     def start(self):
         self._findall()
         print(self.functions_parent)
+        print(self.var_parent)
         return self.content
 
     def _findall(self):
@@ -21,9 +25,13 @@ class UserDefined():
         for line in lines:
             no += 1
             if 'class ' in line:
+                self.curr_type = 'class'
                 self._parse_classes(line)
             elif 'def ' in line:
+                self.curr_type = 'def'
                 name, values = self._parse_function(line)
+            elif '=' in line:
+                self._parse_prop(line)
 
     def _parse_classes(self, line):
         splits = line.split('class ')
@@ -70,3 +78,34 @@ class UserDefined():
                     self.functions_parent[class_name] = [name]
                     self.functions.append(name)
         return name, values
+
+    def _parse_prop(self, line):
+        splits = line.split('=')
+        splits.pop()
+        values = [v.replace(' ', '') for v in splits]
+
+        if self.curr_type == 'class':
+            func_name = self.functions[-1]
+            class_name = ''
+            name = class_name + func_name
+
+            if name in self.var_parent:
+                self.var_parent[name].extend(values)
+            else:
+                self.var_parent[name] = values
+            self.variables.extend(values)
+
+        elif self.curr_type == 'def':
+            func_name = self.functions[-1]
+            class_name = ''
+            name = class_name + func_name
+
+            if name in self.var_parent:
+                self.var_parent[name].extend(values)
+            else:
+                self.var_parent[name] = values
+            self.variables.extend(values)
+
+        else:
+            self.var_parent['__file__'].extend(values)
+            self.variables.extend(values)
