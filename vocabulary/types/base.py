@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-base_types = ['if', 'elif', 'else', 'for', 'while',
+base_types = ['if', 'property', 'elif', 'else', 'for', 'while',
               'class', 'def', 'with', 'as', 'in', 'import', 'from', 'and']
 
 data_types = ['True', 'False', 'None']
@@ -8,7 +8,7 @@ data_types = ['True', 'False', 'None']
 base_functions = ['print(', 'list(', 'str(', 'bytes(', 'dict(', 'set(', 'tuple(',
                   'len(', 'format(', 'open(']
 
-base_types_dict = {'if': "<span>if</span>",
+base_types_dict = {'if': "<span>if</span>", 'property': "<span>property</span>",
                    'elif': "<span>elif</span>", 'else': "<span>else</span>",
                    "for": "<span>for</span>", 'while': "<span>while</span>",
                    'class': "<span>class</span>", 'def': "<span>def</span>",
