@@ -6,9 +6,9 @@ class UserDefined():
         self.indent = 4
         self.content = content
         self.classes_parent = {}
-        self.functions_parent = {'__file__': []}
+        self.functions_parent = {'__main_parent__': []}
         self.functions = []
-        self.var_parent = {'__file__': []}
+        self.var_parent = {'__main_parent__': []}
         self.variables = []
         self.curr_type = ""
 
@@ -65,7 +65,7 @@ class UserDefined():
             values = value_str.split(',')
 
         if indent == 0:
-            self.functions_parent['__file__'].append(name)
+            self.functions_parent['__main_parent__'].append(name)
             self.functions.append(name)
         else:
             ind = indent - self.indent
@@ -107,5 +107,5 @@ class UserDefined():
             self.variables.extend(values)
 
         else:
-            self.var_parent['__file__'].extend(values)
+            self.var_parent['__main_parent__'].extend(values)
             self.variables.extend(values)
