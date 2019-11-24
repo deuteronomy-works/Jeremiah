@@ -8,7 +8,7 @@ ApplicationWindow {
     id: mainWindow
     visible: true
     width: screen.width
-    height: screen.desktopAvailableHeight
+    height: screen.desktopAvailableHeight - 48
     color: "#f1f1f1"
     flags: Qt.FramelessWindowHint | Qt.Window
 
