@@ -1,2 +1,1 @@
-during py_voc
-text inside quotes should not be split
+- Static methods should not be able to declare and use self variables
