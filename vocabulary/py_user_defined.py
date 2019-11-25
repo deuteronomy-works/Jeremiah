@@ -10,7 +10,7 @@ class UserDefined():
         self.functions_parent = {'__main_parent__': []}
         self.functions = []
         self.var_parent = {'__main_parent__': []}
-        self.variables = {'__main_parent__': [{}, []]}
+        self.variables = {'__main_parent__': [{}, []], '___imports': []}
         #self.variables = {'__main_parent__': [{}, {}]}
         self.curr_type = ""
 
@@ -25,6 +25,8 @@ class UserDefined():
         no = -1
         for line in lines:
             no += 1
+            if 'import ' in line:
+                self._parse_imports(line)
             if 'class ' in line:
                 self.curr_type = 'class'
                 self._parse_classes(line)
@@ -81,6 +83,19 @@ class UserDefined():
                     self.functions_parent[class_name] = [name]
                     self.functions.append(name)
         return name, values
+
+    def _parse_imports(self, line):
+
+        splits = line.split('import ')
+        remain = splits[1]
+        if ', ' in remain:
+            values = remain.split(', ')
+        elif ',' in remain:
+            values = remain.split(',')
+        else:
+            values = [remain]
+
+        self.variables['___imports'].extend(values)
 
     def _parse_prop(self, line):
         splits = line.split('=')
