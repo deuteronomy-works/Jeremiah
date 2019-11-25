@@ -6,16 +6,17 @@ class UserDefined():
         self.indent = 4
         self.content = content
         self.classes_parent = {}
+        self.curr_class = ''
         self.functions_parent = {'__main_parent__': []}
         self.functions = []
         self.var_parent = {'__main_parent__': []}
-        self.variables = []
+        self.variables = {'__main_parent__': [{}, []]}
+        #self.variables = {'__main_parent__': [{}, {}]}
         self.curr_type = ""
 
     def start(self):
         self._findall()
-        print(self.functions_parent)
-        print(self.var_parent)
+        print(self.variables)
         return self.content
 
     def _findall(self):
@@ -49,6 +50,8 @@ class UserDefined():
             self.classes_parent[indent].append(name)
         else:
             self.classes_parent[indent] = [name]
+        self.variables[name] = [{'__init__': []}]
+        self.curr_class = name
 
     def _parse_function(self, line):
         splits = line.split('def ')
@@ -83,29 +86,60 @@ class UserDefined():
         splits = line.split('=')
         splits.pop()
         values = [v.replace(' ', '') for v in splits]
+        class_name = ''
+        if self.curr_class != '':
+            class_name = self.curr_class + '.'
+        else:
+            class_name = '__main_parent__.'
 
-        if self.curr_type == 'class':
+        # If even one space exist
+        if line[0] != ' ':
+            self.var_parent['__main_parent__'].extend(values)
+            self.variables['__main_parent__'][1].extend(values)
+
+        elif self.curr_type == 'class':
             func_name = self.functions[-1]
-            class_name = ''
+            #class_name = ''
             name = class_name + func_name
 
             if name in self.var_parent:
                 self.var_parent[name].extend(values)
             else:
                 self.var_parent[name] = values
-            self.variables.extend(values)
+
+            self.variables[class_name[:-1]] = [{func_name: values}]
 
         elif self.curr_type == 'def':
             func_name = self.functions[-1]
-            class_name = ''
+            #class_name = ''
             name = class_name + func_name
+
+            # Add variables declared as self to the init function
+            # of a class instead
+            bk_values = values
+            for value in bk_values:
+                if value.startswith('self.'):
+                    if class_name != '':
+                        par_name = class_name + '__init__'
+                        if par_name in self.var_parent:
+                            self.var_parent[par_name].extend([value])
+                        else:
+                            self.var_parent[par_name] = [value]
+
+                        if func_name in self.variables[class_name[:-1]][0]:
+                            self.variables[class_name[:-1]][0][func_name].extend([value])
+                        else:
+                            self.variables[class_name[:-1]][0][func_name] = [value]
+
+                        values.remove(value)
 
             if name in self.var_parent:
                 self.var_parent[name].extend(values)
             else:
                 self.var_parent[name] = values
-            self.variables.extend(values)
 
-        else:
-            self.var_parent['__main_parent__'].extend(values)
-            self.variables.extend(values)
+            if func_name in self.variables[class_name[:-1]][0]:
+                self.variables[class_name[:-1]][0][func_name].extend(values)
+            else:
+                self.variables[class_name[:-1]][0][func_name] = values
+
