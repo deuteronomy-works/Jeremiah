@@ -16,7 +16,6 @@ class UserDefined():
 
     def start(self):
         self._findall()
-        print(self.variables)
         return self.content
 
     def _findall(self):

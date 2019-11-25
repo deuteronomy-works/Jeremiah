@@ -28,6 +28,8 @@ class Pyvoc():
         # Underline unfound
         self._mark_unfound()
 
+        print(self.content)
+
         return self.content
 
     def _mark_unfound(self):
