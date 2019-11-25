@@ -19,7 +19,8 @@ class Pyvoc():
         # Find user defined
         user_def = UserDefined(self.content)
         self.content = user_def.start()
-        
+        self._sanitise_quotes()
+
         # Replaces
         for var in self.replace_processes:
             self._replace(var)
@@ -101,6 +102,7 @@ class Pyvoc():
 
     def _replace_space_var(self, var, var_dict):
         splits = self.content.split(' ')
+
         for x in var:
             if x in splits:
                 ind = splits.index(x)
@@ -113,3 +115,23 @@ class Pyvoc():
 
         # And back to contents
         self.content = string[:-1]
+
+    def _sanitise_quotes(self):
+        lines = self.content.split('\r\n')
+        cwq = ""
+
+        for line in lines:
+            if '"' in line:
+                cwq = '"'
+            elif "'" in line:
+                cwq = "'"
+            else: continue
+
+            pat = cwq + '.*?' + cwq
+            matches = re.findall(pat, line)
+            if matches:
+                for match in matches:
+                    fixed = match.replace(" ", "&nbsp;")
+                    self.content = self.content.replace(match, fixed)
+
+
