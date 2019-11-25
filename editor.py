@@ -38,7 +38,10 @@ class Editor():
     def _pressed_enter(self, full_text, cur_pos):
 
         # Calculate tabs
-        query = self.values["new_line"] + self._tabs(full_text[-1])
+        if cur_pos != 0:
+            query = self.values["new_line"] + self._tabs(full_text[-1])
+        else:
+            query = self.values["new_line"]
         stat = query
         self.return_enter(stat)
 
