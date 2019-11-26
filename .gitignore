@@ -122,5 +122,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Qmlc
-*.qmlc
+# Jeremiah
+.qmlc
