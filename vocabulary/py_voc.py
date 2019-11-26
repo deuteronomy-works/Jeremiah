@@ -3,6 +3,7 @@ import re
 from vocabulary.py_user_defined import UserDefined
 from vocabulary.types.base import base_types, base_types_dict, base_functions,\
 base_func_dict
+from vocabulary.types.user_defined import user_func_dict
 
 class Pyvoc():
 
@@ -31,8 +32,6 @@ class Pyvoc():
         self.content = self.rebuild_content()
         print('32: ', self.content)
 
-        print(self.content)
-
         return self.content
 
     def main_parser(self, content):
@@ -45,6 +44,9 @@ class Pyvoc():
             no += 1
             line = self._start_replace_processes(line)
             print('45: ', line)
+            # mark function names
+            line = self._mark_func_names(line)
+            print('49: ', line)
             # Underline unfound
             line = self._mark_unfound(line, no)
             print('49: ', line)
@@ -60,6 +62,15 @@ class Pyvoc():
             string += line + '\r\n'
 
         return string
+
+    def _mark_func_names(self, line):
+
+        if 'def ' in line:
+            name = line.split('def ')[1].split('(')[0]
+            html = user_func_dict['foo'].format(name)
+            line = line.replace(name+'(', html)
+
+        return line
 
     def _start_replace_processes(self, line):
 
