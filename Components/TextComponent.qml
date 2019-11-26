@@ -132,6 +132,12 @@ Rectangle {
                 }
                 charPressed(tSpace.getText(0, tSpace.length), event.key, tSpace.lineCount, tSpace.cursorPosition, breaks)
             }
+
+            Shortcut {
+                sequence: StandardKey.Paste
+                onActivated: tSpace.paste()
+            }
+
         }
 
         MouseArea {
