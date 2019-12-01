@@ -55,6 +55,7 @@ class UserDefined():
         self.curr_class = name
 
     def _parse_function(self, line):
+        print('line: ', line)
         splits = line.split('def ')
         
         indent = len(splits[0])
@@ -70,16 +71,22 @@ class UserDefined():
 
         if indent == 0:
             self.functions_parent['__main_parent__'].append(name)
+            self.variables['__main_parent__'].append(name)
             self.functions.append(name)
         else:
             ind = indent - self.indent
+            print(ind, indent, self.indent)
+            print('par: ', self.classes_parent)
             if ind in self.classes_parent:
                 class_name = self.classes_parent[ind][-1]
+                print('class name: ', class_name)
                 if class_name in self.functions_parent:
                     self.functions_parent[class_name].append(name)
+                    self.variables[class_name].append(name)
                     self.functions.append(name)
                 else:
                     self.functions_parent[class_name] = [name]
+                    self.variables[class_name] = [name]
                     self.functions.append(name)
         return name, values
 

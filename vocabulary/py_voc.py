@@ -31,12 +31,12 @@ class Pyvoc():
         user_def = UserDefined(self.content)
         self.content = user_def.start()
         self.variables = user_def.variables
-        self._sanitise_quotes()
+        print('variables: ', self.variables)
+        #self._sanitise_quotes()
 
-        self.main_parser(self.content)
+        #self.main_parser(self.content)
 
-        self.content = self.rebuild_content()
-        print('32: ', self.content)
+        #self.content = self.rebuild_content()
 
         return self.content
 
@@ -52,15 +52,37 @@ class Pyvoc():
 
             else:
                 return None
+
+        elif c_class:
+            # If func name is set
+            if c_func:
+                print('func name set')
+                if name in self.variables[c_class][0][c_func]:
+                    print('found: ')
+                    return name
+                elif name in self.variables['___imports']:
+                    return name
+                elif name in self.variables['__main_parent__'][1]:
+                    return name
+            # if func name is not set
+            else:
+                print('func name unset')
+                if name in self.variables[c_class][0]['__init__']:
+                    print('found')
+                    return name
+                elif name in self.variables['___imports']:
+                    return name
+                elif name in self.variables['__main_parent__'][1]:
+                    return name
+
         # if it is in a function in the file
         elif c_type == 'def':
             if name in self.variables['__main_parent__'][0][c_func]:
                 return name
-            else:
-                print(self.varibles['__main_paernt__'])
-
-        elif c_type == 'class':
-            pass
+            elif name in self.varibles['__main_parent__'][1]:
+                pass
+            elif name in self.variables['___imports']:
+                pass
 
         else:
             print('name: ', name)
@@ -76,14 +98,12 @@ class Pyvoc():
             no += 1
             self._parse_props(line)
             line = self._start_replace_processes(line)
-            print('45: ', line)
             # mark prop names
             line = self._mark_prop_names(line)
             # mark function names
             line = self._mark_func_names(line)
             # Underline unfound
             line = self._mark_unfound(line, no)
-            print('49: ', line)
 
             self.lines.append(line)
 
@@ -106,21 +126,19 @@ class Pyvoc():
 
     def _mark_prop_names(self, line):
         sp_splits = line.split(' ')
-        print('sp: ', sp_splits)
         main_splits = [b for b in sp_splits if b != '']
         print(main_splits)
         
         if len(main_splits) == 1 and '(' not in main_splits[0]:
-            if self.finder(main_splits[0], c_type=self.curr_type, c_class=self.curr_class, c_func=self.curr_func):
-                pass
+            found = self.finder(main_splits[0], c_type=self.curr_type, c_class=self.curr_class, c_func=self.curr_func)
+            if found:
+                print('found dear: ', found)
         return line
 
     def _parse_props(self, line):
 
         sp_splits = line.split(' ')
-        print('sp: ', sp_splits)
         main_splits = [b for b in sp_splits if b != '']
-        print(main_splits)
 
         # find class
         if 'class ' in line:
