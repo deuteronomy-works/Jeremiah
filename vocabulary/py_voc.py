@@ -4,6 +4,7 @@ from vocabulary.py_user_defined import UserDefined
 from vocabulary.types.base import base_types, base_types_dict, base_functions,\
 base_func_dict
 from vocabulary.types.user_defined import user_func_dict
+from vocabulary.types.referenced import ref_prop_name
 
 class Pyvoc():
 
@@ -16,18 +17,20 @@ class Pyvoc():
         self.replace_processes = ['base']
         self.lines = []
         self.r_lines_len = 0
-        self.curr_type = ''
-        self.curr_class = ''
-        self.curr_func = ''
+        self.curr_type = None
+        self.curr_class = None
+        self.curr_func = None
         self.curr_par_indent = 0
         self.curr_type_name = ''
         self.curr_index = 0
+        self.variables = {}
 
     def start(self):
 
         # Find user defined
         user_def = UserDefined(self.content)
         self.content = user_def.start()
+        self.variables = user_def.variables
         self._sanitise_quotes()
 
         self.main_parser(self.content)
@@ -36,6 +39,32 @@ class Pyvoc():
         print('32: ', self.content)
 
         return self.content
+
+    def finder(self, name, c_type=None, c_class=None, c_func=None, p_indent=0):
+        # If it is by itself in the file
+        if not c_type and not c_class and not c_func and not p_indent:
+
+            if name in self.variables['__main_parent__'][1]:
+                return name
+
+            elif name in self.variables['___imports']:
+                return name
+
+            else:
+                return None
+        # if it is in a function in the file
+        elif c_type == 'def':
+            if name in self.variables['__main_parent__'][0][c_func]:
+                return name
+            else:
+                print(self.varibles['__main_paernt__'])
+
+        elif c_type == 'class':
+            pass
+
+        else:
+            print('name: ', name)
+        return
 
     def main_parser(self, content):
 
@@ -48,6 +77,8 @@ class Pyvoc():
             self._parse_props(line)
             line = self._start_replace_processes(line)
             print('45: ', line)
+            # mark prop names
+            line = self._mark_prop_names(line)
             # mark function names
             line = self._mark_func_names(line)
             # Underline unfound
@@ -68,12 +99,28 @@ class Pyvoc():
 
         if 'def</span> ' in line:
             name = line.split('def</span> ')[1].split('(')[0]
-            html = user_func_dict['foo'].format(name)
+            html = user_func_dict['bar'].format(name)
             line = line.replace(name+'(', html)
 
         return line
 
+    def _mark_prop_names(self, line):
+        sp_splits = line.split(' ')
+        print('sp: ', sp_splits)
+        main_splits = [b for b in sp_splits if b != '']
+        print(main_splits)
+        
+        if len(main_splits) == 1 and '(' not in main_splits[0]:
+            if self.finder(main_splits[0], c_type=self.curr_type, c_class=self.curr_class, c_func=self.curr_func):
+                pass
+        return line
+
     def _parse_props(self, line):
+
+        sp_splits = line.split(' ')
+        print('sp: ', sp_splits)
+        main_splits = [b for b in sp_splits if b != '']
+        print(main_splits)
 
         # find class
         if 'class ' in line:
@@ -87,11 +134,36 @@ class Pyvoc():
 
             b_split = splits[1]
             if '(' in b_split:
-                name = b_split('(')[0]
+                name = b_split.split('(')[0]
+            else:
+                name = b_split.split(':')[0].replace(' ', '')
+
+            self.curr_class, self.curr_par_indent = name, indent
+
+        # find def
+        if 'def' in main_splits:
+            self.curr_type = 'def'
+            splits = line.split('def ')
+            a_split = splits[0]
+
+            # if all are spaces then its an indent
+            if a_split == ' '*len(a_split):
+                indent = len(a_split)
+
+            b_split = splits[1]
+            if '(' in b_split:
+                name = b_split.split('(')[0]
             else:
                 name = b_split(':')[0].replace(' ', '')
-            
-            self.curr_class, self.curr_par_indent = name, indent
+
+            self.curr_func, self.curr_par_indent = name, indent
+
+        # it is the only thing on the line
+        if len(main_splits) == 1:
+            if '(' in main_splits[0]:
+                pass
+            else:
+                pass
 
     def _start_replace_processes(self, line):
 
