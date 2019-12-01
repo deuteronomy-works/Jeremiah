@@ -17,6 +17,9 @@ class Pyvoc():
         self.lines = []
         self.r_lines_len = 0
         self.curr_type = ''
+        self.curr_class = ''
+        self.curr_func = ''
+        self.curr_par_indent = 0
         self.curr_type_name = ''
         self.curr_index = 0
 
@@ -42,11 +45,11 @@ class Pyvoc():
         no = -1
         for line in lines:
             no += 1
+            self._parse_props(line)
             line = self._start_replace_processes(line)
             print('45: ', line)
             # mark function names
             line = self._mark_func_names(line)
-            print('49: ', line)
             # Underline unfound
             line = self._mark_unfound(line, no)
             print('49: ', line)
@@ -56,21 +59,39 @@ class Pyvoc():
     def rebuild_content(self):
 
         string = ''
-        print('56: ', self.lines)
         for line in self.lines:
-            print('58: ', line)
             string += line + '\r\n'
 
         return string
 
     def _mark_func_names(self, line):
 
-        if 'def ' in line:
-            name = line.split('def ')[1].split('(')[0]
+        if 'def</span> ' in line:
+            name = line.split('def</span> ')[1].split('(')[0]
             html = user_func_dict['foo'].format(name)
             line = line.replace(name+'(', html)
 
         return line
+
+    def _parse_props(self, line):
+
+        # find class
+        if 'class ' in line:
+            self.curr_type = 'class'
+            splits = line.split('class ')
+            a_split = splits[0]
+
+            # if all are spaces then its an indent
+            if a_split == ' '*len(a_split):
+                indent = len(a_split)
+
+            b_split = splits[1]
+            if '(' in b_split:
+                name = b_split('(')[0]
+            else:
+                name = b_split(':')[0].replace(' ', '')
+            
+            self.curr_class, self.curr_par_indent = name, indent
 
     def _start_replace_processes(self, line):
 
@@ -121,12 +142,20 @@ class Pyvoc():
         # recompose back into a line
         for each in word_splits_s:
             if each == '\u2029':
+                # a space then a break
                 content += '\u2029'
+
             elif each == '&nbsp;':
                 content += '&nbsp;'
+
             elif each.endswith('\u2029</span>'):
                 content += each
+
+            elif each.endswith('\u2029'):
+                # a break of line after a modification
+                content += each
             else:
+                # this should only perhaps for the middle
                 content += each + "&nbsp;"
 
         return content
@@ -141,7 +170,7 @@ class Pyvoc():
             main_func_dict = base_func_dict
 
         # variable replacement
-        self._replace_space_var(main_var, main_dict, line)
+        line = self._replace_space_var(main_var, main_dict, line)
 
         # function replacement
         for y in main_func:
