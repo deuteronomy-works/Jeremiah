@@ -57,6 +57,7 @@ class Pyvoc():
             # If func name is set
             if c_func:
                 print('func name set')
+                print('cc: ', c_class, c_func)
                 if name in self.variables[c_class][0][c_func]:
                     print('found: ')
                     return name

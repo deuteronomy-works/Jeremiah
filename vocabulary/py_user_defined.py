@@ -51,7 +51,7 @@ class UserDefined():
             self.classes_parent[indent].append(name)
         else:
             self.classes_parent[indent] = [name]
-        self.variables[name] = [{'__init__': []}]
+        self.variables[name] = {'__init__': []}
         self.curr_class = name
 
     def _parse_function(self, line):
@@ -61,6 +61,7 @@ class UserDefined():
 
         remain = splits[1].split('(')
         name = remain[0]
+        print('supposed to be in func: ', name)
         value_str = remain[1].split(')')[0]
 
         if ' ' in value_str:
@@ -78,11 +79,11 @@ class UserDefined():
                 class_name = self.classes_parent[ind][-1]
                 if class_name in self.functions_parent:
                     self.functions_parent[class_name].append(name)
-                    self.variables[class_name].append(name)
+                    self.variables[class_name].update({name: []})
                     self.functions.append(name)
                 else:
                     self.functions_parent[class_name] = [name]
-                    self.variables[class_name] = [name]
+                    self.variables[class_name] = {name: []}
                     self.functions.append(name)
         return name, values
 
@@ -124,7 +125,7 @@ class UserDefined():
             else:
                 self.var_parent[name] = values
 
-            self.variables[class_name[:-1]] = [{func_name: values}]
+            self.variables[class_name[:-1]] = {func_name: values}
 
         elif self.curr_type == 'def':
             func_name = self.functions[-1]
@@ -143,10 +144,10 @@ class UserDefined():
                         else:
                             self.var_parent[par_name] = [value]
 
-                        if func_name in self.variables[class_name[:-1]][0]:
-                            self.variables[class_name[:-1]][0][func_name].extend([value])
+                        if func_name in self.variables[class_name[:-1]]:
+                            self.variables[class_name[:-1]][func_name].extend([value])
                         else:
-                            self.variables[class_name[:-1]][0][func_name] = [value]
+                            self.variables[class_name[:-1]][func_name] = [value]
 
                         values.remove(value)
 
@@ -155,8 +156,8 @@ class UserDefined():
             else:
                 self.var_parent[name] = values
 
-            if func_name in self.variables[class_name[:-1]][0]:
-                self.variables[class_name[:-1]][0][func_name].extend(values)
+            if func_name in self.variables[class_name[:-1]]:
+                self.variables[class_name[:-1]][func_name].extend(values)
             else:
-                self.variables[class_name[:-1]][0][func_name] = values
+                self.variables[class_name[:-1]][func_name] = [values]
 
