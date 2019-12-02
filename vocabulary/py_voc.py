@@ -32,11 +32,11 @@ class Pyvoc():
         self.content = user_def.start()
         self.variables = user_def.variables
         print('variables: ', self.variables)
-        #self._sanitise_quotes()
+        self._sanitise_quotes()
 
-        #self.main_parser(self.content)
+        self.main_parser(self.content)
 
-        #self.content = self.rebuild_content()
+        self.content = self.rebuild_content()
 
         return self.content
 
