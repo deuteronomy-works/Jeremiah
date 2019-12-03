@@ -41,6 +41,7 @@ class Pyvoc():
         return self.content
 
     def finder(self, name, c_type=None, c_class=None, c_func=None, p_indent=0):
+        print('line: ', name, c_type, c_class, c_func, p_indent)
         # If it is by itself in the file
         if not c_type and not c_class and not c_func and not p_indent:
 
@@ -56,18 +57,20 @@ class Pyvoc():
         elif c_class:
             # If func name is set
             if c_func:
-                print('func name set')
-                print('cc: ', c_class, c_func)
                 if name in self.variables[c_class][0][c_func]:
                     print('found: ')
                     return name
+                # prop can be found inside the __init__
+                elif name in self.variables[c_class][0]['__init__']:
+                    print('found: ', name)
+                    return name
+                # search the general imports
                 elif name in self.variables['___imports']:
                     return name
                 elif name in self.variables['__main_parent__'][1]:
                     return name
             # if func name is not set
             else:
-                print('func name unset')
                 if name in self.variables[c_class][0]['__init__']:
                     print('found')
                     return name
@@ -128,12 +131,12 @@ class Pyvoc():
     def _mark_prop_names(self, line):
         sp_splits = line.split(' ')
         main_splits = [b for b in sp_splits if b != '']
-        print(main_splits)
         
         if len(main_splits) == 1 and '(' not in main_splits[0]:
             found = self.finder(main_splits[0], c_type=self.curr_type, c_class=self.curr_class, c_func=self.curr_func)
             if found:
-                print('found dear: ', found)
+                # mark
+                line = line.replace(found, ref_prop_name['baz'].format(found))
         return line
 
     def _parse_props(self, line):

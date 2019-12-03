@@ -4,8 +4,9 @@ class UserDefined():
 
     def __init__(self, content):
         self.indent = 4
+        self.par_indent = 0
         self.content = content
-        self.classes_parent = {}
+        self.classes_parent = {} # Store indents of classes and their names
         self.curr_class = ''
         self.functions_parent = {'__main_parent__': []}
         self.functions = []
@@ -47,11 +48,23 @@ class UserDefined():
             name = remain.split(':')[0]
 
         indent = len(spaces)
+        # if this is outside the parent
+        if indent <= self.par_indent:
+            self.par_indent = indent
+            # remove the nested items
+            self.functions.append("")
+            self.curr_type = 'class'
+
+        # For classes nesting sake
+        # {
         if indent in self.classes_parent:
             self.classes_parent[indent].append(name)
         else:
             self.classes_parent[indent] = [name]
-        self.variables[name] = {'__init__': []}
+        # }
+
+        self.functions_parent[name] = ['__init__']
+        self.variables.update({name: [{'__init__': []}]})
         self.curr_class = name
 
     def _parse_function(self, line):
@@ -61,7 +74,6 @@ class UserDefined():
 
         remain = splits[1].split('(')
         name = remain[0]
-        print('supposed to be in func: ', name)
         value_str = remain[1].split(')')[0]
 
         if ' ' in value_str:
@@ -71,7 +83,7 @@ class UserDefined():
 
         if indent == 0:
             self.functions_parent['__main_parent__'].append(name)
-            self.variables['__main_parent__'].append(name)
+            self.variables['__main_parent__'][0].update({name: []})
             self.functions.append(name)
         else:
             ind = indent - self.indent
@@ -79,11 +91,13 @@ class UserDefined():
                 class_name = self.classes_parent[ind][-1]
                 if class_name in self.functions_parent:
                     self.functions_parent[class_name].append(name)
-                    self.variables[class_name].update({name: []})
                     self.functions.append(name)
+                    # Add the function name to the class dict
+                    if name not in self.variables[class_name][0]:
+                        self.variables[class_name][0].update({name: []})
                 else:
                     self.functions_parent[class_name] = [name]
-                    self.variables[class_name] = {name: []}
+                    self.variables[class_name] = [{name: []}]
                     self.functions.append(name)
         return name, values
 
@@ -98,7 +112,7 @@ class UserDefined():
         else:
             values = [remain]
 
-        self.variables['___imports'].extend(values)
+        self.variables['___imports'][1].extend(values)
 
     def _parse_prop(self, line):
         splits = line.split('=')
@@ -115,49 +129,55 @@ class UserDefined():
             self.var_parent['__main_parent__'].extend(values)
             self.variables['__main_parent__'][1].extend(values)
 
-        elif self.curr_type == 'class':
-            func_name = self.functions[-1]
-            #class_name = ''
-            name = class_name + func_name
+        else:
+
+            if self.curr_type == 'class':
+    
+                func_name = self.functions[-1]
+                # If there is no function yet defined in the class
+                if func_name == '':
+                    func_name = '__init__'
+                #class_name = ''
+                name = class_name + func_name
+    
+                if name in self.var_parent:
+                    self.var_parent[name].extend(values)
+                else:
+                    self.var_parent[name] = values
+    
+                self.variables[class_name[:-1]] = [{func_name: values}]
+
+            elif self.curr_type == 'def':
+                func_name = self.functions[-1]
+                #class_name = ''
+                name = class_name + func_name
+    
+                # Add variables declared as self to the init function
+                # of a class instead
+                bk_values = values
+                for value in bk_values:
+                    if value.startswith('self.'):
+                        if class_name != '':
+                            par_name = class_name + '__init__'
+                            if par_name in self.var_parent:
+                                self.var_parent[par_name].extend([value])
+                            else:
+                                self.var_parent[par_name] = [value]
+
+                            if func_name in self.variables[class_name[:-1]][0]:
+                                self.variables[class_name[:-1]][0][func_name].extend([value])
+                            else:
+                                self.variables[class_name[:-1]][0][func_name] = [value]
+
+                            values.remove(value)
 
             if name in self.var_parent:
                 self.var_parent[name].extend(values)
             else:
                 self.var_parent[name] = values
 
-            self.variables[class_name[:-1]] = {func_name: values}
-
-        elif self.curr_type == 'def':
-            func_name = self.functions[-1]
-            #class_name = ''
-            name = class_name + func_name
-
-            # Add variables declared as self to the init function
-            # of a class instead
-            bk_values = values
-            for value in bk_values:
-                if value.startswith('self.'):
-                    if class_name != '':
-                        par_name = class_name + '__init__'
-                        if par_name in self.var_parent:
-                            self.var_parent[par_name].extend([value])
-                        else:
-                            self.var_parent[par_name] = [value]
-
-                        if func_name in self.variables[class_name[:-1]]:
-                            self.variables[class_name[:-1]][func_name].extend([value])
-                        else:
-                            self.variables[class_name[:-1]][func_name] = [value]
-
-                        values.remove(value)
-
-            if name in self.var_parent:
-                self.var_parent[name].extend(values)
+            if func_name in self.variables[class_name[:-1]][0]:
+                self.variables[class_name[:-1]][0][func_name].extend(values)
             else:
-                self.var_parent[name] = values
-
-            if func_name in self.variables[class_name[:-1]]:
-                self.variables[class_name[:-1]][func_name].extend(values)
-            else:
-                self.variables[class_name[:-1]][func_name] = [values]
+                self.variables[class_name[:-1]][0][func_name] = [values]
 
