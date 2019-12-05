@@ -129,28 +129,32 @@ class Pyvoc():
         return line
 
     def _mark_prop_names(self, line):
-        sp_splits = line.split('=')
-        a = sp_splits[-1].split(' ')
-        # remove empty space chars and commas
-        b = [pick.replace(',', '') for pick in a if pick != '' and pick != ',']
-        # remove strings props
-        c = [pick for pick in b if "'" not in pick and '"' not in pick]
-        d = [pick for pick in c if '(' not in pick]
-        e = [pick for pick in d if not pick.startswith('<span>')]
-        main_splits = e
-        print('main: ', main_splits)
+        # mark property that are been referenced
+        # narrow down to certain instances
+        if 'class</span>' or 'def</span>' or ': ' not in line:
+            sp_splits = line.split('=')
+            a = sp_splits[-1].split(' ')
+            print('all: ', a)
+            # remove empty space chars and commas
+            b = [pick.replace(',', '') for pick in a if pick != '' and pick != ',']
+            # remove strings props
+            c = [pick for pick in b if "'" not in pick and '"' not in pick]
+            d = [pick.replace('(', '').replace(')', '') for pick in c]
+            e = [pick.replace('{', '').replace('}', '') for pick in d]
+            f = [pick.replace('[', '').replace(']', '') for pick in e]
+            g = [pick for pick in f if not pick.startswith('<span>')]
+            h = [pick for pick in g if pick not in ['-', '+', '/', '*']]
+            i = [pick for pick in h if pick not in ['(', ')', '[', ']', '{', '}']]
+            main_splits = i
+            print('main: ', main_splits)
 
-        # IHandle all in a loop
-        for prop in main_splits:
-            found = self.finder(prop, c_type=self.curr_type, c_class=self.curr_class, c_func=self.curr_func)
-            if found:
-                # mark
-                line = line.replace(found, ref_prop_name['baz'].format(found))
-        #TODO
-        # It is a normal set using variable
-        #It contains a comma and a bracket
-        #It contains a comma alone
-        return line
+            # IHandle all in a loop
+            for prop in main_splits:
+                found = self.finder(prop, c_type=self.curr_type, c_class=self.curr_class, c_func=self.curr_func)
+                if found:
+                    # mark
+                    line = line.replace(found, ref_prop_name['baz'].format(found))
+            return line
 
     def _parse_props(self, line):
 
