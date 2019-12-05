@@ -14,6 +14,7 @@ class Pyvoc():
         self.base_types = base_types
         self.base_types_dict = base_types_dict
         self.operand_types = ['+', '-', '=', '/', '*']
+        self.escape_parentesis = ['[', ']', '{', '}', '(', ')']
         self.replace_processes = ['base']
         self.lines = []
         self.r_lines_len = 0
@@ -232,9 +233,22 @@ class Pyvoc():
         no = -1
         content = ""
 
+        print('word splits: ', word_splits)
+        begi = ""
+        end = ""
         # Start with the Marking of the unfound
         for word in word_splits:
             no += 1
+            # parentesis
+            if word[0] in self.escape_parentesis:
+                word = word[1:]
+                begi = word[0]
+            elif word[-1] in self.escape_parentesis:
+                word = word[:-1]
+                end = word[-1]
+
+            print('new word: ', word)
+
             if word.startswith('<span>'):
                 pass
             elif word == "\u2029":
@@ -247,7 +261,7 @@ class Pyvoc():
                 else:
                     word_splits_s[no] = "&nbsp;"
             else:
-                stat = '<span style="color: red">' + word + '</span>'
+                stat = begi + '<span style="color: red">' + word + '</span>' + end
                 word_splits_s[no] = stat
 
         # recompose back into a line
