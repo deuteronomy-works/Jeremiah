@@ -214,6 +214,17 @@ class Pyvoc():
 
     def _mark_unfound(self, line, no):
 
+        left_ahead = ""
+        if '=' in line and not '"="' in line or "'='" in line:
+            junk_s = line.split('=')
+            junky = junk_s[:-1]
+            ww = ''
+            for x in junky:
+                ww += x + '='
+            left_ahead = ww[:-1] + '='
+            line = junk_s[-1]
+            print(left_ahead, line)
+        
         word_splits = []
         # Find if line contains just spaces
         founds = re.findall("[A-Za-z0-9`~!@#$%^&*\(\)\[\]-{}_=+/?<,.|>]*", line)
@@ -240,12 +251,13 @@ class Pyvoc():
         for word in word_splits:
             no += 1
             # parentesis
-            if word[0] in self.escape_parentesis:
-                word = word[1:]
-                begi = word[0]
-            elif word[-1] in self.escape_parentesis:
-                word = word[:-1]
-                end = word[-1]
+            if word:
+                if word[0] in self.escape_parentesis:
+                    word = word[1:]
+                    begi = word[0]
+                elif word[-1] in self.escape_parentesis:
+                    word = word[:-1]
+                    end = word[-1]
 
             print('new word: ', word)
 
@@ -283,8 +295,9 @@ class Pyvoc():
                 # this should only perhaps for the middle
                 content += each + "&nbsp;"
 
-        return content
+        content = left_ahead + content
         self.content = content
+        return content
 
     def _replace(self, var, line):
 
