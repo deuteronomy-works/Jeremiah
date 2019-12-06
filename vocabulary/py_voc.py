@@ -223,8 +223,7 @@ class Pyvoc():
                 ww += x + '='
             left_ahead = ww[:-1] + '='
             line = junk_s[-1]
-            print(left_ahead, line)
-        
+
         word_splits = []
         # Find if line contains just spaces
         founds = re.findall("[A-Za-z0-9`~!@#$%^&*\(\)\[\]-{}_=+/?<,.|>]*", line)

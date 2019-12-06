@@ -1,1 +1,2 @@
+- Add numbers and math operands to vocabulary
 - Static methods should not be able to declare and use self variables
