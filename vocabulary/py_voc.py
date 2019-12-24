@@ -59,11 +59,9 @@ class Pyvoc():
             # If func name is set
             if c_func:
                 if name in self.variables[c_class][0][c_func]:
-                    print('found: ')
                     return name
                 # prop can be found inside the __init__
                 elif name in self.variables[c_class][0]['__init__']:
-                    print('found: ', name)
                     return name
                 # search the general imports
                 elif name in self.variables['___imports']:
@@ -73,7 +71,6 @@ class Pyvoc():
             # if func name is not set
             else:
                 if name in self.variables[c_class][0]['__init__']:
-                    print('found')
                     return name
                 elif name in self.variables['___imports']:
                     return name
@@ -104,6 +101,7 @@ class Pyvoc():
             self._parse_props(line)
             line = self._start_replace_processes(line)
             # mark prop names
+            print('line before: ', line)
             line = self._mark_prop_names(line)
             # mark function names
             line = self._mark_func_names(line)
@@ -111,16 +109,21 @@ class Pyvoc():
             line = self._mark_unfound(line, no)
 
             self.lines.append(line)
+            print('lines all the time: ', self.lines)
 
     def rebuild_content(self):
 
         string = ''
         for line in self.lines:
-            string += line + '\r\n'
+            if type(line) == type(''):
+                string += line + '\r\n'
 
         return string
 
     def _mark_func_names(self, line):
+
+        if not line:
+            return line
 
         if 'def</span> ' in line:
             name = line.split('def</span> ')[1].split('(')[0]
@@ -132,10 +135,11 @@ class Pyvoc():
     def _mark_prop_names(self, line):
         # mark property that are been referenced
         # narrow down to certain instances
-        if 'class</span>' or 'def</span>' or ': ' not in line:
+        if 'class</span>' in line or 'def</span>' in line or ': ' in line:
+            pass
+        else:
             sp_splits = line.split('=')
             a = sp_splits[-1].split(' ')
-            print('all: ', a)
             # remove empty space chars and commas
             b = [pick.replace(',', '') for pick in a if pick != '' and pick != ',']
             # remove strings props
@@ -147,7 +151,6 @@ class Pyvoc():
             h = [pick for pick in g if pick not in ['-', '+', '/', '*']]
             i = [pick for pick in h if pick not in ['(', ')', '[', ']', '{', '}']]
             main_splits = i
-            print('main: ', main_splits)
 
             # IHandle all in a loop
             for prop in main_splits:
@@ -155,7 +158,8 @@ class Pyvoc():
                 if found:
                     # mark
                     line = line.replace(found, ref_prop_name['baz'].format(found))
-            return line
+
+        return line
 
     def _parse_props(self, line):
 
@@ -214,6 +218,8 @@ class Pyvoc():
 
     def _mark_unfound(self, line, no):
 
+        if not line:
+            return line
         left_ahead = ""
         if '=' in line and not '"="' in line or "'='" in line:
             junk_s = line.split('=')
@@ -243,7 +249,6 @@ class Pyvoc():
         no = -1
         content = ""
 
-        print('word splits: ', word_splits)
         begi = ""
         end = ""
         # Start with the Marking of the unfound
@@ -257,8 +262,6 @@ class Pyvoc():
                 elif word[-1] in self.escape_parentesis:
                     word = word[:-1]
                     end = word[-1]
-
-            print('new word: ', word)
 
             if word.startswith('<span>'):
                 pass
