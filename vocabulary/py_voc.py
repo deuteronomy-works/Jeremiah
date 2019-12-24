@@ -39,6 +39,7 @@ class Pyvoc():
 
         self.content = self.rebuild_content()
 
+
         return self.content
 
     def finder(self, name, c_type=None, c_class=None, c_func=None, p_indent=0):
@@ -98,10 +99,12 @@ class Pyvoc():
         no = -1
         for line in lines:
             no += 1
+            # Replace the newline character with its unicode character
+            if line == '':
+                line = '\u2029'
             self._parse_props(line)
             line = self._start_replace_processes(line)
             # mark prop names
-            print('line before: ', line)
             line = self._mark_prop_names(line)
             # mark function names
             line = self._mark_func_names(line)
@@ -109,15 +112,13 @@ class Pyvoc():
             line = self._mark_unfound(line, no)
 
             self.lines.append(line)
-            print('lines all the time: ', self.lines)
 
     def rebuild_content(self):
 
         string = ''
         for line in self.lines:
             if type(line) == type(''):
-                string += line + '\r\n'
-
+                string += line + ''
         return string
 
     def _mark_func_names(self, line):
@@ -135,6 +136,9 @@ class Pyvoc():
     def _mark_prop_names(self, line):
         # mark property that are been referenced
         # narrow down to certain instances
+        if not line:
+            return line
+
         if 'class</span>' in line or 'def</span>' in line or ': ' in line:
             pass
         else:
@@ -212,6 +216,9 @@ class Pyvoc():
     def _start_replace_processes(self, line):
 
         # Replaces
+        if not line:
+            return line
+
         for var in self.replace_processes:
             line = self._replace(var, line)
         return line
@@ -288,7 +295,7 @@ class Pyvoc():
                 content += '&nbsp;'
 
             elif each.endswith('\u2029</span>'):
-                content += each
+                content += each.replace('\u2029</span>', '</span>\u2029')
 
             elif each.endswith('\u2029'):
                 # a break of line after a modification

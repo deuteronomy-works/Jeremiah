@@ -1,7 +1,3 @@
-"""
-License and stuff
-"""
-
 LOVE = 'this'
 
 def lover():
