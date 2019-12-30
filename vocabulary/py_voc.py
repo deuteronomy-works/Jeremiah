@@ -32,7 +32,6 @@ class Pyvoc():
         user_def = UserDefined(self.content)
         self.content = user_def.start()
         self.variables = user_def.variables
-        print('variables: ', self.variables)
         self._sanitise_quotes()
 
         self.main_parser(self.content)
@@ -43,7 +42,6 @@ class Pyvoc():
         return self.content
 
     def finder(self, name, c_type=None, c_class=None, c_func=None, p_indent=0):
-        print('line: ', name, c_type, c_class, c_func, p_indent)
         # If it is by itself in the file
         if not c_type and not c_class and not c_func and not p_indent:
 
@@ -83,9 +81,9 @@ class Pyvoc():
             if name in self.variables['__main_parent__'][0][c_func]:
                 return name
             elif name in self.variables['__main_parent__'][1]:
-                pass
+                return name
             elif name in self.variables['___imports']:
-                pass
+                return name
 
         else:
             print('name: ', name)
@@ -136,6 +134,7 @@ class Pyvoc():
     def _mark_prop_names(self, line):
         # mark property that are been referenced
         # narrow down to certain instances
+
         if not line:
             return line
 
@@ -143,7 +142,11 @@ class Pyvoc():
             pass
         else:
             sp_splits = line.split('=')
-            a = sp_splits[-1].split(' ')
+            print('sp: ', sp_splits)
+
+            # find those used in brackets
+            new_splits = self._find_props_in_brac(sp_splits)
+            a = new_splits[-1].split(' ')
             # remove empty space chars and commas
             b = [pick.replace(',', '') for pick in a if pick != '' and pick != ',']
             # remove strings props
@@ -155,6 +158,7 @@ class Pyvoc():
             h = [pick for pick in g if pick not in ['-', '+', '/', '*']]
             i = [pick for pick in h if pick not in ['(', ')', '[', ']', '{', '}']]
             main_splits = i
+            print('main splits: ', main_splits)
 
             # IHandle all in a loop
             for prop in main_splits:
@@ -164,6 +168,24 @@ class Pyvoc():
                     line = line.replace(found, ref_prop_name['baz'].format(found))
 
         return line
+
+    def _find_props_in_brac(self, raw_list):
+
+        """
+        Gets the property names out of brackets
+        and adds them to the property list
+        """
+
+        final_list = []
+        data = raw_list[-1]
+
+        if '(' in data and ')' in data:
+            content = data.split('(')[-1].split(')')[0] # it contains 1+
+            final_list.append(content)
+        else:
+            return raw_list
+
+        return final_list
 
     def _parse_props(self, line):
 
@@ -249,7 +271,12 @@ class Pyvoc():
                 line = ''
         else:
             line += '\u2029'
+
+        # Add left ahead back to line
+        line = left_ahead + line
+
         splits = line.split(" ")
+        splits = self._add_list_span_without_spaces(splits)
         word_splits.extend(splits)
         word_splits_s = word_splits
 
@@ -270,6 +297,7 @@ class Pyvoc():
                     word = word[:-1]
                     end = word[-1]
 
+            print('esc: ', word)
             if word.startswith('<span>'):
                 pass
             elif word == "\u2029":
@@ -304,9 +332,24 @@ class Pyvoc():
                 # this should only perhaps for the middle
                 content += each + "&nbsp;"
 
-        content = left_ahead + content
+        content = content
         self.content = content
         return content
+
+    def _add_list_span_without_spaces(self, old_list):
+        lister = old_list
+        for l in old_list:
+            if '</span>' in l:
+                lister.remove(l)
+                j = l.split('</span>')
+                nn = [n + '</span>' for n in j if n.startswith('<span')]
+                mm = [m for m in j if not m.startswith('<span')]
+                nn.extend(mm)
+                lister.extend(nn)
+                
+
+        print('here is lister: ', lister)
+        return lister
 
     def _replace(self, var, line):
 

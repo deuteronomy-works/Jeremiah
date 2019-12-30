@@ -1,0 +1,8 @@
+love =&nbsp;<span style="color: red">'lsd'</span>
+
+<span>class</span>&nbsp;<span style="color: red">Doc():</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span>love</span>
+
+&nbsp;&nbsp;&nbsp;&nbsp;<span>def</span>&nbsp;<span>__init__</span>():
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: red">pass</span>
