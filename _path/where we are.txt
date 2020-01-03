@@ -4,7 +4,9 @@ finds more that one variable used by itself
 finds a variable used inside a function by itself
 finds a variable used inside class and class function by itself
 finds one or more variables passed on as a parameter
+escape strings
 
 _funcion
 finds a variable used inside the function by itself
 finds one or more variables passed on as a paremeter
+escape strings
