@@ -276,9 +276,6 @@ class Pyvoc():
         else:
             line += '\u2029'
 
-        # Add left ahead back to line
-        line = left_ahead + line
-
         splits = line.split(" ")
         splits = add_splitter(splits, self.space_char)
         print('what is this: ', splits)
@@ -333,7 +330,8 @@ class Pyvoc():
                 # this should only perhaps for the middle
                 content += each
 
-        content = content
+        # Add left ahead back to line
+        content = left_ahead + content
         self.content = content
         return content
 
