@@ -89,7 +89,7 @@ class Pyvoc():
                 return name
 
         else:
-            print('name: ', name)
+            pass
         return
 
     def main_parser(self, content):
@@ -145,7 +145,6 @@ class Pyvoc():
             pass
         else:
             sp_splits = line.split('=')
-            print('sp: ', sp_splits)
 
             # find those used in brackets
             new_splits = self._find_props_in_brac(sp_splits)
@@ -161,7 +160,6 @@ class Pyvoc():
             h = [pick for pick in g if pick not in ['-', '+', '/', '*']]
             i = [pick for pick in h if pick not in ['(', ')', '[', ']', '{', '}']]
             main_splits = i
-            print('main splits: ', main_splits)
 
             # IHandle all in a loop
             for prop in main_splits:
@@ -281,11 +279,9 @@ class Pyvoc():
 
         splits = line.split(" ")
         splits = add_splitter(splits, self.space_char)
-        print('what is this: ', splits)
         sParen = SplitParenthesis(splits)
         splits = sParen.start()
         #splits = self._add_list_span_without_spaces(splits)
-        print('now what is this: ', splits)
         word_splits.extend(splits)
         word_splits_s = word_splits
 
@@ -339,16 +335,11 @@ class Pyvoc():
             if '</span>' in l:
                 lister.remove(l)
                 j = l.split('</span>')
-                print('non: ', j)
                 nn = [n + '</span>' for n in j if n.startswith('<span')]
-                print('n: ', nn)
                 mm = [m for m in j if not m.startswith('<span')]
-                print('mm: ', mm)
                 nn.extend(mm)
                 lister.extend(nn)
-                
 
-        print('here is lister: ', lister)
         return lister
 
     def _replace(self, var, line):
