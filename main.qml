@@ -361,8 +361,6 @@ ApplicationWindow {
 
         onCheckedVocab: {
             var ret = return_vocab
-            print('lvoe: ')
-            print(ret)
             textComp[current_tab].text = ret
             count()
         }
