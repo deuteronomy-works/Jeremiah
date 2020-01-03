@@ -297,6 +297,8 @@ class Pyvoc():
             no += 1
             if word.startswith('<span>'):
                 pass
+            elif self._is_string(word):
+                word_splits_s[no] = word
             elif word == "\u2029":
                 word_splits_s[no] = '\u2029'
             elif word == self.space_char:
@@ -334,6 +336,13 @@ class Pyvoc():
         content = content
         self.content = content
         return content
+
+    def _is_string(self, word):
+        if word:
+            if word[0] == "'" or word[0] == '"':
+                return True
+
+        return False
 
     def _add_list_span_without_spaces(self, old_list):
         lister = old_list
