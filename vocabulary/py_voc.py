@@ -5,6 +5,7 @@ from vocabulary.types.base import base_types, base_types_dict, base_functions,\
 base_func_dict
 from vocabulary.types.user_defined import user_func_dict
 from vocabulary.types.referenced import ref_prop_name
+from vocabulary.misc.misc_py import SplitParenthesis
 
 class Pyvoc():
 
@@ -276,7 +277,11 @@ class Pyvoc():
         line = left_ahead + line
 
         splits = line.split(" ")
-        splits = self._add_list_span_without_spaces(splits)
+        print('what is this: ', splits)
+        sParen = SplitParenthesis(splits)
+        splits = sParen.start()
+        #splits = self._add_list_span_without_spaces(splits)
+        print('now what is this: ', splits)
         word_splits.extend(splits)
         word_splits_s = word_splits
 
@@ -342,8 +347,11 @@ class Pyvoc():
             if '</span>' in l:
                 lister.remove(l)
                 j = l.split('</span>')
+                print('non: ', j)
                 nn = [n + '</span>' for n in j if n.startswith('<span')]
+                print('n: ', nn)
                 mm = [m for m in j if not m.startswith('<span')]
+                print('mm: ', mm)
                 nn.extend(mm)
                 lister.extend(nn)
                 
