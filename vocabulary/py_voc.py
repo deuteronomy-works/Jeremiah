@@ -288,21 +288,9 @@ class Pyvoc():
         no = -1
         content = ""
 
-        begi = ""
-        end = ""
         # Start with the Marking of the unfound
         for word in word_splits:
             no += 1
-            # parentesis
-            if word:
-                if word[0] in self.escape_parentesis:
-                    word = word[1:]
-                    begi = word[0]
-                elif word[-1] in self.escape_parentesis:
-                    word = word[:-1]
-                    end = word[-1]
-
-            print('esc: ', word)
             if word.startswith('<span>'):
                 pass
             elif word == "\u2029":
@@ -315,7 +303,7 @@ class Pyvoc():
                 else:
                     word_splits_s[no] = "&nbsp;"
             else:
-                stat = begi + '<span style="color: red">' + word + '</span>' + end
+                stat = '<span style="color: red">' + word + '</span>'
                 word_splits_s[no] = stat
 
         # recompose back into a line
