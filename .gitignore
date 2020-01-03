@@ -123,4 +123,4 @@ dmypy.json
 .pyre/
 
 # Jeremiah
-.qmlc
+*.qmlc

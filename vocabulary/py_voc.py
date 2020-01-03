@@ -274,9 +274,6 @@ class Pyvoc():
         else:
             line += '\u2029'
 
-        # Add left ahead back to line
-        line = left_ahead + line
-
         splits = line.split(" ")
         splits = add_splitter(splits, self.space_char)
         sParen = SplitParenthesis(splits)
@@ -293,15 +290,19 @@ class Pyvoc():
             no += 1
             if word.startswith('<span>'):
                 pass
+            elif self._is_string(word):
+                word_splits_s[no] = word
             elif word == "\u2029":
                 word_splits_s[no] = '\u2029'
-            elif word == "":
+            elif word == self.space_char:
                 # A space unless its the last entry
+                word_splits_s[no] = self.space_char
+            elif word == "":
                 if (no + 1) == len(word_splits_s):
                     # If it is the last entry probably its not a space
                     word_splits_s.pop()
-                else:
-                    word_splits_s[no] = self.space_char
+            elif word in self.escape_parentesis or word in self.operand_types:
+                word_splits_s[no] = word
             else:
                 stat = '<span style="color: red">' + word + '</span>'
                 word_splits_s[no] = stat
@@ -325,9 +326,17 @@ class Pyvoc():
                 # this should only perhaps for the middle
                 content += each
 
-        content = content
+        # Add left ahead back to line
+        content = left_ahead + content
         self.content = content
         return content
+
+    def _is_string(self, word):
+        if word:
+            if word[0] == "'" or word[0] == '"':
+                return True
+
+        return False
 
     def _add_list_span_without_spaces(self, old_list):
         lister = old_list
