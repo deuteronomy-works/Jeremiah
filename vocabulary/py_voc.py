@@ -5,6 +5,7 @@ from vocabulary.types.base import base_types, base_types_dict, base_functions,\
 base_func_dict
 from vocabulary.types.user_defined import user_func_dict
 from vocabulary.types.referenced import ref_prop_name
+from vocabulary.misc.misc import add_splitter
 from vocabulary.misc.misc_py import SplitParenthesis
 
 class Pyvoc():
@@ -277,6 +278,7 @@ class Pyvoc():
         line = left_ahead + line
 
         splits = line.split(" ")
+        splits = add_splitter(splits, '&nbsp;')
         print('what is this: ', splits)
         sParen = SplitParenthesis(splits)
         splits = sParen.start()
@@ -323,7 +325,7 @@ class Pyvoc():
                 content += each
             else:
                 # this should only perhaps for the middle
-                content += each + "&nbsp;"
+                content += each
 
         content = content
         self.content = content
