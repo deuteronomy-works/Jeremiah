@@ -17,6 +17,7 @@ class Pyvoc():
         self.base_types_dict = base_types_dict
         self.operand_types = ['+', '-', '=', '/', '*']
         self.escape_parentesis = ['[', ']', '{', '}', '(', ')']
+        self.space_char = "&nbsp;"
         self.replace_processes = ['base']
         self.lines = []
         self.r_lines_len = 0
@@ -278,7 +279,7 @@ class Pyvoc():
         line = left_ahead + line
 
         splits = line.split(" ")
-        splits = add_splitter(splits, '&nbsp;')
+        splits = add_splitter(splits, self.space_char)
         print('what is this: ', splits)
         sParen = SplitParenthesis(splits)
         splits = sParen.start()
@@ -303,7 +304,7 @@ class Pyvoc():
                     # If it is the last entry probably its not a space
                     word_splits_s.pop()
                 else:
-                    word_splits_s[no] = "&nbsp;"
+                    word_splits_s[no] = self.space_char
             else:
                 stat = '<span style="color: red">' + word + '</span>'
                 word_splits_s[no] = stat
@@ -315,7 +316,7 @@ class Pyvoc():
                 content += '\u2029'
 
             elif each == '&nbsp;':
-                content += '&nbsp;'
+                content += self.space_char
 
             elif each.endswith('\u2029</span>'):
                 content += each.replace('\u2029</span>', '</span>\u2029')
