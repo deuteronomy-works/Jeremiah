@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-def add_spliter(splits, splitter):
+def add_splitter(splits, splitter):
 
     """
     Adds a spliter back to the splits

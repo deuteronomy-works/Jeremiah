@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from vocabulary.misc.misc import add_splitter
 
 class SplitParenthesis():
     
@@ -14,17 +15,9 @@ class SplitParenthesis():
     def _spliter(self, conts, chars):
 
         splits = conts.split(chars)
-        newer = []
-        no = -1
-        for x in splits:
-            no += 1
-            if no == len(splits) - 1:
-                newer.append(x)
-                break
-            newer.append(x)
-            newer.append(chars)
+        splits = add_splitter(splits, chars)
     
-        return newer
+        return splits
     
     def _insert_list(self, ind, par, child):
 
