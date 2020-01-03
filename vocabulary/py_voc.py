@@ -201,6 +201,7 @@ class Pyvoc():
             splits = line.split('class ')
             a_split = splits[0]
 
+            indent = 0
             # if all are spaces then its an indent
             if a_split == ' '*len(a_split):
                 indent = len(a_split)
