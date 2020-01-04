@@ -36,6 +36,7 @@ class Pyvoc():
         self.content = user_def.start()
         self.variables = user_def.variables
         self._sanitise_quotes()
+        print('aa: ', self.content)
 
         self.main_parser(self.content)
 
@@ -295,7 +296,7 @@ class Pyvoc():
         # Start with the Marking of the unfound
         for word in word_splits:
             no += 1
-            if word.startswith('<span>'):
+            if word.startswith('<span'):
                 pass
             elif self._is_string(word):
                 word_splits_s[no] = word
