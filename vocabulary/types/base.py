@@ -3,10 +3,20 @@
 base_types = ['if', 'property', 'elif', 'else', 'for', 'while',
               'class', 'def', 'with', 'as', 'in', 'import', 'from', 'and']
 
+base_operand = ['<', '>', '+', '-', '*', '&', '%', '=', '!', '/']
+
 data_types = ['True', 'False', 'None']
 
 base_functions = ['print(', 'list(', 'str(', 'bytes(', 'dict(', 'set(', 'tuple(',
                   'len(', 'format(', 'open(']
+
+base_operand_repl = "[[span]]{}[[;span]]"
+
+base_opera_dict = {'+': "<span>+<;span>", '-': "<span>-<;span>",
+                   '*': "<span>*<;span>", '/': "<span>/<;span>",
+                   '&': "<span>&<;span>", '%': "<span>%<;span>",
+                   '=': "<span>=<;span>", '!': "<span>!<;span>",
+                   '<': "{[span]}<{[;span]}", '>': "{[span]}>{[;span]}"}
 
 base_types_dict = {'if': "<span>if</span>", 'property': "<span>property</span>",
                    'elif': "<span>elif</span>", 'else': "<span>else</span>",

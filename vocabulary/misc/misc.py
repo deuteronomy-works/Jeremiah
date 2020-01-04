@@ -21,3 +21,9 @@ def add_splitter(splits, splitter):
         restruct.append(splitter)
 
     return restruct
+
+
+def fix_span_stat(old_stat):
+    # fix escape for less and greater than symbols
+    new_stat = old_stat.replace(';', '/').replace(']]', '>').replace('[[', '<')
+    return new_stat

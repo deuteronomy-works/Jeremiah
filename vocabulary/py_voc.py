@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import re
 from vocabulary.py_user_defined import UserDefined
-from vocabulary.types.base import base_types, base_types_dict, base_functions,\
-base_func_dict
+from vocabulary.types.base import base_types, base_types_dict, base_operand,\
+base_operand_repl, base_functions,base_func_dict
 from vocabulary.types.user_defined import user_func_dict
 from vocabulary.types.referenced import ref_prop_name
-from vocabulary.misc.misc import add_splitter
+from vocabulary.misc.misc import add_splitter, fix_span_stat
 from vocabulary.misc.misc_py import SplitParenthesis
 
 class Pyvoc():
@@ -18,7 +18,7 @@ class Pyvoc():
         self.operand_types = ['+', '-', '=', '/', '*']
         self.escape_parentesis = ['[', ']', '{', '}', '(', ')']
         self.space_char = "&nbsp;"
-        self.replace_processes = ['base']
+        self.replace_processes = ['spaceless', 'base']
         self.lines = []
         self.r_lines_len = 0
         self.curr_type = None
@@ -254,18 +254,20 @@ class Pyvoc():
         if not line:
             return line
         left_ahead = ""
-        if '=' in line and not '"="' in line or "'='" in line:
-            junk_s = line.split('=')
+
+        equal_sign = fix_span_stat(base_operand_repl.format('='))
+        if equal_sign in line:
+            junk_s = line.split(equal_sign)
             junky = junk_s[:-1]
             ww = ''
             for x in junky:
                 ww += x + '='
-            left_ahead = ww[:-1] + '='
+            left_ahead = ww[:-1] + equal_sign
             line = junk_s[-1]
 
         word_splits = []
         # Find if line contains just spaces
-        founds = re.findall("[A-Za-z0-9`~!@#$%^&*\(\)\[\]-{}_=+/?<,.|>]*", line)
+        founds = re.findall(r"[A-Za-z0-9`~!@#$%^&*\(\)\[\]-{}_=+/?<,.|>]*", line)
         found = str(founds).replace(', ', '').replace("'", "")
         if found == '[]':
             # Empty
@@ -368,6 +370,13 @@ class Pyvoc():
             main_func = base_functions
             main_func_dict = base_func_dict
 
+        elif var == 'spaceless':
+            main_var = base_operand
+            main_dict = base_operand_repl
+            line = self._replace_spaceless_var(main_var, main_dict, line)
+            print('liner: ', line)
+            return line
+
         # variable replacement
         line = self._replace_space_var(main_var, main_dict, line)
 
@@ -376,6 +385,29 @@ class Pyvoc():
             if y in line:
                 line = line.replace(y, main_func_dict[y])
 
+        return line
+
+    def _replace_spaceless_var(self, main_var, main_dict, line):
+
+        for x in main_var:
+            if x in line and '"'+x+'"' not in line and "'"+x+"'" not in line:
+                line = line.replace(x, main_dict.format(x))
+        
+        # fix escape for less and greater than symbols
+        line = fix_span_stat(line)
+        print('mno: ', line)
+
+        found = re.findall(r'".*?.*?"', line)
+        if found:
+            for f in found:
+                line = line.replace(f, "<span style='color: green'>"+f+"</span>")
+                
+        found = re.findall(r"'.*?.*?'", line)
+        if found:
+            for f in found:
+                line = line.replace(f, '<span style="color: green">'+f+'</span>')
+
+        print('lineas: ', line)
         return line
 
     def _replace_space_var(self, var, var_dict, line):
