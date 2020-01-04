@@ -25,5 +25,5 @@ def add_splitter(splits, splitter):
 
 def fix_span_stat(old_stat):
     # fix escape for less and greater than symbols
-    new_stat = old_stat.replace(';', '/').replace(']]', '>').replace('[[', '<')
+    new_stat = old_stat.replace('[[span]]', '<span>').replace('[[;span]]', '</span>')
     return new_stat
