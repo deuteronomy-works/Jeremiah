@@ -278,12 +278,13 @@ class Pyvoc():
         else:
             line += '\u2029'
 
-        splits = line.split(" ")
+        """splits = line.split(" ")
         splits = add_splitter(splits, self.space_char)
-        print('what is this: ', splits)
+        print('what is this: ', splits)"""
+        splits = [line]
         sParen = SplitParenthesis(splits)
         splits = sParen.start()
-        #splits = self._add_list_span_without_spaces(splits)
+        splits = self._add_list_span_without_spaces(splits)
         print('now what is this: ', splits)
         word_splits.extend(splits)
         word_splits_s = word_splits
