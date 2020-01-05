@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from vocabulary.misc.misc import escape_user_strings, put_back_user_strings
+
 
 class UserDefined():
 
@@ -11,7 +13,7 @@ class UserDefined():
         self.functions_parent = {'__main_parent__': []}
         self.functions = []
         self.var_parent = {'__main_parent__': []}
-        self.variables = {'__main_parent__': [{}, []], '___imports': []}
+        self.variables = {'__main_parent__': [{}, []], '___imports': [{}, []]}
         #self.variables = {'__main_parent__': [{}, {}]}
         self.curr_type = ""
 
@@ -24,6 +26,7 @@ class UserDefined():
         lines = self.content.split('\r\n')
         no = -1
         for line in lines:
+            sngl, dobl, line = escape_user_strings(line)
             no += 1
             if 'import ' in line:
                 self._parse_imports(line)
@@ -35,6 +38,7 @@ class UserDefined():
                 name, values = self._parse_function(line)
             elif '=' in line:
                 self._parse_prop(line)
+            line = put_back_user_strings(sngl, dobl, line)
 
     def _parse_classes(self, line):
         splits = line.split('class ')
@@ -74,6 +78,7 @@ class UserDefined():
 
         remain = splits[1].split('(')
         name = remain[0]
+        print('rem: ', remain)
         value_str = remain[1].split(')')[0]
 
         if ' ' in value_str:
