@@ -41,5 +41,5 @@ def put_back_unicode(line):
 
 def fix_span_stat(old_stat):
     # fix escape for less and greater than symbols
-    new_stat = old_stat.replace('[[span]]', '<span>').replace('[[;span]]', '</span>')
+    new_stat = old_stat.replace('[[span]]', '<span>').replace('[[jeridespan]]', '</span>')
     return new_stat
