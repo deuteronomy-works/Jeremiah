@@ -10,3 +10,6 @@ _funcion
 finds a variable used inside the function by itself
 finds one or more variables passed on as a paremeter
 escape strings
+
+__
+parses string successfully
