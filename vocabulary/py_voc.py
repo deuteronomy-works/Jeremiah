@@ -5,7 +5,7 @@ from vocabulary.types.base import base_types, base_types_dict, base_operand,\
 base_operand_repl, base_functions,base_func_dict
 from vocabulary.types.user_defined import user_func_dict
 from vocabulary.types.referenced import ref_prop_name
-from vocabulary.misc.misc import add_splitter, fix_span_stat
+from vocabulary.misc.misc import add_splitter, fix_span_stat, escape_unicode, put_back_unicode
 from vocabulary.misc.misc_py import SplitParenthesis
 
 class Pyvoc():
@@ -35,8 +35,8 @@ class Pyvoc():
         user_def = UserDefined(self.content)
         self.content = user_def.start()
         self.variables = user_def.variables
-        self._sanitise_quotes()
-        print('aa: ', self.content)
+        self._replace_all_space()
+        #self._sanitise_quotes()
 
         self.main_parser(self.content)
 
@@ -146,7 +146,6 @@ class Pyvoc():
             pass
         else:
             sp_splits = line.split('=')
-            print('sp: ', sp_splits)
 
             # find those used in brackets
             new_splits = self._find_props_in_brac(sp_splits)
@@ -162,7 +161,6 @@ class Pyvoc():
             h = [pick for pick in g if pick not in ['-', '+', '/', '*']]
             i = [pick for pick in h if pick not in ['(', ')', '[', ']', '{', '}']]
             main_splits = i
-            print('main splits: ', main_splits)
 
             # IHandle all in a loop
             for prop in main_splits:
@@ -285,10 +283,13 @@ class Pyvoc():
         splits = [line]
         sParen = SplitParenthesis(splits)
         splits = sParen.start()
-        splits = self._add_list_span_without_spaces(splits)
-        print('now what is this: ', splits)
+        #splits = self._add_spaces_to_list(splits)
+        print('bef: ', splits)
+        splits = self._add_span_to_list(splits)
+        print('after: ', splits)
         word_splits.extend(splits)
         word_splits_s = word_splits
+        print('word splits: ', word_splits_s)
 
         no = -1
         content = ""
@@ -346,22 +347,39 @@ class Pyvoc():
 
         return False
 
-    def _add_list_span_without_spaces(self, old_list):
+    def _add_spaces_to_list(self, old_list):
+        lister = old_list
+        for l in old_list:
+            if self.space_char in l:
+                lister.remove(l)
+                one = l.split(self.space_char)
+                print('one here: ', one)
+                no = -1
+                for o in one:
+                    no += 1
+                    if o == '':
+                        one[no] = self.space_char
+                lister.extend(one)
+
+        return lister
+
+    def _add_span_to_list(self, old_list):
+
         lister = old_list
         for l in old_list:
             if '</span>' in l:
                 lister.remove(l)
-                j = l.split('</span>')
-                print('non: ', j)
-                nn = [n + '</span>' for n in j if n.startswith('<span')]
-                print('n: ', nn)
-                mm = [m for m in j if not m.startswith('<span')]
-                print('mm: ', mm)
-                nn.extend(mm)
-                lister.extend(nn)
-                
+                occ = re.findall('<span.*?.*?.*?</span>', l)
+                lo = re.split('<span.*?.*?.*?</span>', l)
 
-        print('here is lister: ', lister)
+                no = -1
+                for oc in occ:
+                    no += 2
+                    lo.insert(no, oc)
+
+                lister.extend(lo)
+                break
+
         return lister
 
     def _replace(self, var, line):
@@ -376,7 +394,6 @@ class Pyvoc():
             main_var = base_operand
             main_dict = base_operand_repl
             line = self._replace_spaceless_var(main_var, main_dict, line)
-            print('liner: ', line)
             return line
 
         # variable replacement
@@ -391,25 +408,58 @@ class Pyvoc():
 
     def _replace_spaceless_var(self, main_var, main_dict, line):
 
+        found = re.findall(r'".*?.*?"', line)
+        sngl = []
+        if found:
+            no = -1
+            for f in found:
+                no += 1
+                sngl.append(f)
+                line = line.replace(f, 'sngl____'+str(no))
+                # line = line.replace(f, "<span style='color: green'>"+f+"</span>")
+
+        found = re.findall(r"'.*?.*?'", line)
+        dobl = []
+        if found:
+            no = -1
+            for f in found:
+                no += 1
+                dobl.append(f)
+                line = line.replace(f, 'dobl____'+str(no))
+                # line = line.replace(f, '<span style="color: green">'+f+'</span>')
+
+        # escape unicode characters including space char &nbsp;
+        line = escape_unicode(line)
+
         for x in main_var:
             if x in line and '"'+x+'"' not in line and "'"+x+"'" not in line:
                 line = line.replace(x, main_dict.format(x))
-        
+
         # fix escape for less and greater than symbols
         line = fix_span_stat(line)
-        print('mno: ', line)
 
-        found = re.findall(r'".*?.*?"', line)
-        if found:
-            for f in found:
-                line = line.replace(f, "<span style='color: green'>"+f+"</span>")
-                
-        found = re.findall(r"'.*?.*?'", line)
-        if found:
-            for f in found:
-                line = line.replace(f, '<span style="color: green">'+f+'</span>')
+        # put back stuff remove because of special chars parsing
+        line = put_back_unicode(line)
+        line = self._put_strings_back(sngl, dobl, line)
 
-        print('lineas: ', line)
+        return line
+
+    def _put_strings_back(self, sngl, dobl, line):
+        
+        # single
+        no = -1
+        for f in sngl:
+            no += 1
+            line = line.replace('sngl____'+str(no),
+                                "<span style='color: #46c28e'>"+sngl[no]+"</span>")
+
+        # double
+        no = -1
+        for f in dobl:
+            no += 1
+            line = line.replace('dobl____'+str(no),
+                                "<span style='color: #46c28e'>"+dobl[no]+"</span>")
+
         return line
 
     def _replace_space_var(self, var, var_dict, line):
@@ -428,6 +478,10 @@ class Pyvoc():
         # And back to contents
         line = string[:-1]
         return line
+
+    def _replace_all_space(self):
+        # change spaces to unicode &nbsp;
+        self.content = self.content.replace(' ', self.space_char)
 
     def _sanitise_quotes(self):
         lines = self.content.split('\r\n')
