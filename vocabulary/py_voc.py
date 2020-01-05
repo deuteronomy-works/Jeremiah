@@ -284,12 +284,9 @@ class Pyvoc():
         sParen = SplitParenthesis(splits)
         splits = sParen.start()
         #splits = self._add_spaces_to_list(splits)
-        print('bef: ', splits)
         splits = self._add_span_to_list(splits)
-        print('after: ', splits)
         word_splits.extend(splits)
         word_splits_s = word_splits
-        print('word splits: ', word_splits_s)
 
         no = -1
         content = ""
@@ -353,7 +350,7 @@ class Pyvoc():
             if self.space_char in l:
                 lister.remove(l)
                 one = l.split(self.space_char)
-                print('one here: ', one)
+
                 no = -1
                 for o in one:
                     no += 1
