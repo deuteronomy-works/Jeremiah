@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import re
 from vocabulary.py_user_defined import UserDefined
-from vocabulary.types.base import base_types, base_types_dict, base_operand,\
+from vocabulary.types.base import base_types, base_operand,\
 base_operand_repl, base_functions,base_func_dict, base_types_repl
 from vocabulary.types.user_defined import user_func_dict
 from vocabulary.types.referenced import ref_prop_name
 from vocabulary.misc.misc import add_splitter, fix_span_stat, escape_unicode,\
-put_back_unicode, escape_user_strings, put_back_user_strings, escape_user_comments
+put_back_unicode, escape_user_strings, put_back_user_strings,\
+escape_user_comments, put_back_user_comments
 from vocabulary.misc.misc_py import SplitParenthesis
 
 class Pyvoc():
@@ -47,8 +48,6 @@ class Pyvoc():
         return self.content
 
     def finder(self, name, c_type=None, c_class=None, c_func=None, p_indent=0):
-        print('finder: ', name, len(name))
-        print('c_class: ', c_type, c_class, c_func)
 
         # check name
         if not name:
@@ -118,18 +117,13 @@ class Pyvoc():
                 line = '\u2029'
 
             self._parse_props(line)
-            print('props pars: ', line)
             line = self._start_replace_processes(line)
-            print('after replace proc: ', line)
             # mark prop names
             line = self._mark_prop_names(line)
-            print('after mark prop names: ', line)
             # mark function names
             line = self._mark_func_names(line)
-            print('after mark func names: ', line)
             # Underline unfound
             line = self._mark_unfound(line, no)
-            print('after mark unfound: ', line)
 
             self.lines.append(line)
 
@@ -166,31 +160,20 @@ class Pyvoc():
         else:
             # split on <span>
             sp_splits = re.split('<span.*?.*?.*?=\s?</span>', line)
-            print('sp: ', sp_splits)
 
             # find those used in brackets
             new_splits = self._find_props_in_brac(sp_splits)
             main_splits = self._separ([sp_splits[-1]])
-            print('new: ', new_splits)
-            print('main_splits: ', main_splits)
             """a = new_splits[-1].split(' ')
-            print('a: ', a)
             # remove empty space chars and commas
             b = [pick.replace(',', '') for pick in a if pick != '' and pick != ',']
-            print('b: ', b)
             # remove strings props
             c = [pick for pick in b if "'" not in pick and '"' not in pick]
-            print('c: ', c)
             d = [pick.replace('(', '').replace(')', '') for pick in c]
-            print('d: ', d)
             e = [pick.replace('{', '').replace('}', '') for pick in d]
-            print('e: ', e)
             f = [pick.replace('[', '').replace(']', '') for pick in e]
-            print('f: ', f)
             g = [pick for pick in f if not pick.startswith('<span>')]
-            print('g: ', g)
             h = [pick for pick in g if pick not in ['-', '+', '/', '*']]
-            print('h: ', h)
             i = [pick for pick in h if pick not in ['(', ')', '[', ']', '{', '}']]
             print('i: ', i)
             main_splits = i"""
@@ -251,9 +234,6 @@ class Pyvoc():
 
         # find def
         if 'def' in main_splits:
-            print('\n', '*************')
-            print('parse_props: ', main_splits)
-            print('\n', '********%%%%%%%%%%%%%%%%')
             self.curr_type = 'def'
             splits = line.split('def ')
             a_split = splits[0]
@@ -288,14 +268,10 @@ class Pyvoc():
         return line
 
     def _separ(self, splits):
-        print('pre span: ', splits)
         splits = self._add_span_to_list(splits)
-        print('after span: ', splits)
         sParen = SplitParenthesis(splits)
         splits = sParen.start()
-        print('pre: ', splits)
         splits = self._add_spaces_to_list(splits)
-        print('space boy: ', splits)
         return splits
 
     def _mark_unfound(self, line, no):
@@ -476,9 +452,11 @@ class Pyvoc():
     def _replace_spaceless_var(self, main_var, main_dict, line):
 
         sngl, dobl, line = escape_user_strings(line)
+        print('1: ', line)
 
         # escape unicode characters including space char &nbsp;
         line = escape_unicode(line)
+        print('2: ', line)
 
         for x in main_var:
             if x in line and '"'+x+'"' not in line and "'"+x+"'" not in line:
@@ -486,12 +464,51 @@ class Pyvoc():
 
         # fix escape for less and greater than symbols
         line = fix_span_stat(line)
+        print('3: ', line)
 
         # put back stuff remove because of special chars parsing
         line = put_back_unicode(line)
+        print('4: ', line)
         line = put_back_user_strings(sngl, dobl, line)
+        print('5: ', line)
 
         return line
+
+    def _replace_space_var(self, var, var_dict, line):
+
+        sngl, dobl, line = escape_user_strings(line)
+        print('6: ', line)
+        sgnl_com, dobl_com, line = escape_user_comments(line)
+        print('7: ', line)
+
+        splits = line.split(' ')
+
+        for x in var:
+            if x in splits:
+                ind = splits.index(x)
+                splits[ind] = var_dict.format(x)
+
+        # Add all to string
+        string = ""
+        for a in splits:
+            string += a + " "
+
+        # And back to contents
+        line = string[:-1]
+
+        # fix escape for less and greater than symbols
+        line = fix_span_stat(line)
+        print('8: ', line)
+        line = put_back_user_comments(sgnl_com, dobl_com, line)
+        print('9: ', line)
+        line = put_back_user_strings(sngl, dobl, line)
+        print('10: ', line)
+
+        return line
+
+    def _replace_all_space(self):
+        # change spaces to unicode &nbsp;
+        self.content = self.content.replace(' ', self.space_char)
 
     def _put_strings_back(self, sngl, dobl, line):
         
@@ -510,27 +527,6 @@ class Pyvoc():
                                 "<span style='color: #46c28e'>"+dobl[no]+"</span>")
 
         return line
-
-    def _replace_space_var(self, var, var_dict, line):
-        splits = line.split(' ')
-
-        for x in var:
-            if x in splits:
-                ind = splits.index(x)
-                splits[ind] = var_dict.format(x)
-
-        # Add all to string
-        string = ""
-        for a in splits:
-            string += a + " "
-
-        # And back to contents
-        line = string[:-1]
-        return line
-
-    def _replace_all_space(self):
-        # change spaces to unicode &nbsp;
-        self.content = self.content.replace(' ', self.space_char)
 
     def _sanitise_quotes(self):
         lines = self.content.split('\r\n')
