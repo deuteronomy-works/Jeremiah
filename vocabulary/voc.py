@@ -8,10 +8,9 @@ class Vocabulary():
         self.contents = conts
 
     def start(self):
-        print('conts: ', self.contents, '\n')
         py_voca = py_voc.Pyvoc(self.contents)
         py_checked = py_voca.start()
-        
+
         print('\n\n********************')
         print(py_checked)
         print('\n\n********************')

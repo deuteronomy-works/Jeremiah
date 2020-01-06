@@ -24,7 +24,7 @@ def add_splitter(splits, splitter):
     return restruct
 
 def escape_html_metachars(word):
-    html_metachars = {'&': 'amp;', '<': '&lt;', '>': '&gt;', '"': 'quot;'}
+    html_metachars = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}
     for entity in html_metachars:
         word = word.replace(entity, html_metachars[entity])
     return word

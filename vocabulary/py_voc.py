@@ -17,7 +17,7 @@ class Pyvoc():
         self.base_types_dict = base_types_dict
         self.operand_types = ['+', '-', '=', '/', '*']
         self.escape_parentesis = ['[', ']', '{', '}', '(', ')']
-        self.space_char = "&nbsp;"
+        self.space_char = " "
         self.replace_processes = ['spaceless', 'base']
         self.lines = []
         self.r_lines_len = 0
@@ -35,19 +35,29 @@ class Pyvoc():
         user_def = UserDefined(self.content)
         self.content = user_def.start()
         self.variables = user_def.variables
-        self._replace_all_space()
         #self._sanitise_quotes()
+        # self._replace_all_space()
 
         self.main_parser(self.content)
 
         self.content = self.rebuild_content()
-
-        print('here we go: ', self.content)
-
+        #self._unsanitise_quotes()
 
         return self.content
 
     def finder(self, name, c_type=None, c_class=None, c_func=None, p_indent=0):
+        print('finder: ', name, len(name))
+        print('c_class: ', c_type, c_class, c_func)
+        print('var: ', self.variables)
+
+        # check name
+        if not name:
+            return None
+        elif name == self.space_char:
+            return None
+        elif name == (self.space_char * len(name)):
+            return None
+
         # If it is by itself in the file
         if not c_type and not c_class and not c_func and not p_indent:
 
@@ -97,6 +107,8 @@ class Pyvoc():
 
     def main_parser(self, content):
 
+        print('variables: ', self.variables)
+        
         lines = content.split('\r\n')
         self.r_lines_len = len(lines)
 
@@ -108,13 +120,18 @@ class Pyvoc():
                 line = '\u2029'
 
             self._parse_props(line)
+            print('props pars: ', line)
             line = self._start_replace_processes(line)
+            print('after replace proc: ', line)
             # mark prop names
             line = self._mark_prop_names(line)
+            print('after mark prop names: ', line)
             # mark function names
             line = self._mark_func_names(line)
+            print('after mark func names: ', line)
             # Underline unfound
             line = self._mark_unfound(line, no)
+            print('after mark unfound: ', line)
 
             self.lines.append(line)
 
@@ -149,22 +166,36 @@ class Pyvoc():
         if 'class</span>' in line or 'def</span>' in line or ': ' in line:
             pass
         else:
-            sp_splits = line.split('=')
+            # split on <span>
+            sp_splits = re.split('<span.*?.*?.*?=\s?</span>', line)
+            print('sp: ', sp_splits)
 
             # find those used in brackets
             new_splits = self._find_props_in_brac(sp_splits)
-            a = new_splits[-1].split(' ')
+            main_splits = self._separ([sp_splits[-1]])
+            print('new: ', new_splits)
+            print('main_splits: ', main_splits)
+            """a = new_splits[-1].split(' ')
+            print('a: ', a)
             # remove empty space chars and commas
             b = [pick.replace(',', '') for pick in a if pick != '' and pick != ',']
+            print('b: ', b)
             # remove strings props
             c = [pick for pick in b if "'" not in pick and '"' not in pick]
+            print('c: ', c)
             d = [pick.replace('(', '').replace(')', '') for pick in c]
+            print('d: ', d)
             e = [pick.replace('{', '').replace('}', '') for pick in d]
+            print('e: ', e)
             f = [pick.replace('[', '').replace(']', '') for pick in e]
+            print('f: ', f)
             g = [pick for pick in f if not pick.startswith('<span>')]
+            print('g: ', g)
             h = [pick for pick in g if pick not in ['-', '+', '/', '*']]
+            print('h: ', h)
             i = [pick for pick in h if pick not in ['(', ')', '[', ']', '{', '}']]
-            main_splits = i
+            print('i: ', i)
+            main_splits = i"""
 
             # IHandle all in a loop
             for prop in main_splits:
@@ -252,6 +283,17 @@ class Pyvoc():
             line = self._replace(var, line)
         return line
 
+    def _separ(self, splits):
+        print('pre span: ', splits)
+        splits = self._add_span_to_list(splits)
+        print('after span: ', splits)
+        sParen = SplitParenthesis(splits)
+        splits = sParen.start()
+        print('pre: ', splits)
+        splits = self._add_spaces_to_list(splits)
+        print('space boy: ', splits)
+        return splits
+
     def _mark_unfound(self, line, no):
 
         if not line:
@@ -284,10 +326,11 @@ class Pyvoc():
         splits = add_splitter(splits, self.space_char)
         print('what is this: ', splits)"""
         splits = [line]
-        splits = self._add_span_to_list(splits)
+        splits = self._separ(splits)
+        """splits = self._add_span_to_list(splits)
         sParen = SplitParenthesis(splits)
         splits = sParen.start()
-        splits = self._add_spaces_to_list(splits)
+        splits = self._add_spaces_to_list(splits)"""
         word_splits.extend(splits)
         word_splits_s = word_splits
 
@@ -322,7 +365,7 @@ class Pyvoc():
                 # a space then a break
                 content += '\u2029'
 
-            elif each == '&nbsp;':
+            elif each == self.space_char:
                 content += self.space_char
 
             elif each.endswith('\u2029</span>'):
@@ -363,11 +406,11 @@ class Pyvoc():
                     lister.remove(l)
                     one = l.split(self.space_char)
     
-                    no = -1
+                    """no = -1
                     for o in one:
                         no += 1
                         if o == '':
-                            one[no] = self.space_char
+                            one[no] = self.space_char"""
 
                     # add the space char back
                     # so we have it for the final recomposition
@@ -500,7 +543,8 @@ class Pyvoc():
             matches = re.findall(pat, line)
             if matches:
                 for match in matches:
-                    fixed = match.replace(" ", "&nbsp;")
+                    fixed = match.replace(" ", "&nbspjeride;")
                     self.content = self.content.replace(match, fixed)
 
-
+    def _unsanitise_quotes(self):
+        self.content = self.content.replace('&nbspjeride;', " ")
