@@ -5,7 +5,7 @@ from vocabulary.types.base import base_types, base_types_dict, base_operand,\
 base_operand_repl, base_functions,base_func_dict
 from vocabulary.types.user_defined import user_func_dict
 from vocabulary.types.referenced import ref_prop_name
-from vocabulary.misc.misc import add_splitter, fix_span_stat, escape_unicode, put_back_unicode
+from vocabulary.misc.misc import add_splitter, fix_span_stat, escape_unicode, put_back_unicode, escape_user_strings, put_back_user_strings
 from vocabulary.misc.misc_py import SplitParenthesis
 
 class Pyvoc():
@@ -41,6 +41,8 @@ class Pyvoc():
         self.main_parser(self.content)
 
         self.content = self.rebuild_content()
+
+        print('here we go: ', self.content)
 
 
         return self.content
@@ -104,6 +106,7 @@ class Pyvoc():
             # Replace the newline character with its unicode character
             if line == '':
                 line = '\u2029'
+
             self._parse_props(line)
             line = self._start_replace_processes(line)
             # mark prop names
@@ -114,6 +117,7 @@ class Pyvoc():
             line = self._mark_unfound(line, no)
 
             self.lines.append(line)
+
 
     def rebuild_content(self):
 
@@ -253,7 +257,6 @@ class Pyvoc():
         if not line:
             return line
         left_ahead = ""
-
         equal_sign = fix_span_stat(base_operand_repl.format('='))
         if equal_sign in line:
             junk_s = line.split(equal_sign)
@@ -281,10 +284,10 @@ class Pyvoc():
         splits = add_splitter(splits, self.space_char)
         print('what is this: ', splits)"""
         splits = [line]
+        splits = self._add_span_to_list(splits)
         sParen = SplitParenthesis(splits)
         splits = sParen.start()
-        #splits = self._add_spaces_to_list(splits)
-        splits = self._add_span_to_list(splits)
+        splits = self._add_spaces_to_list(splits)
         word_splits.extend(splits)
         word_splits_s = word_splits
 
@@ -345,18 +348,31 @@ class Pyvoc():
         return False
 
     def _add_spaces_to_list(self, old_list):
-        lister = old_list
-        for l in old_list:
-            if self.space_char in l:
-                lister.remove(l)
-                one = l.split(self.space_char)
+        lister = []
 
-                no = -1
-                for o in one:
-                    no += 1
-                    if o == '':
-                        one[no] = self.space_char
-                lister.extend(one)
+        for l in old_list:
+            lister.append(l)
+
+            # we have already splitted on span so this is safe
+            if '<span' in l:
+                pass
+            elif self.space_char == l:
+                pass
+            else:
+                if self.space_char in l:
+                    lister.remove(l)
+                    one = l.split(self.space_char)
+    
+                    no = -1
+                    for o in one:
+                        no += 1
+                        if o == '':
+                            one[no] = self.space_char
+
+                    # add the space char back
+                    # so we have it for the final recomposition
+                    one = add_splitter(one, self.space_char)
+                    lister.extend(one)
 
         return lister
 
@@ -364,6 +380,13 @@ class Pyvoc():
 
         lister = old_list
         for l in old_list:
+            if '"</span>' in l or "'</span>" in l:
+                continue
+            elif "</span>'" in l or '</span>"' in l:
+                continue
+            elif "'</span>'" in l or '"</span>"' in l:
+                continue
+
             if '</span>' in l:
                 lister.remove(l)
                 occ = re.findall('<span.*?.*?.*?</span>', l)
@@ -405,25 +428,7 @@ class Pyvoc():
 
     def _replace_spaceless_var(self, main_var, main_dict, line):
 
-        found = re.findall(r'".*?.*?"', line)
-        sngl = []
-        if found:
-            no = -1
-            for f in found:
-                no += 1
-                sngl.append(f)
-                line = line.replace(f, 'sngl____'+str(no))
-                # line = line.replace(f, "<span style='color: green'>"+f+"</span>")
-
-        found = re.findall(r"'.*?.*?'", line)
-        dobl = []
-        if found:
-            no = -1
-            for f in found:
-                no += 1
-                dobl.append(f)
-                line = line.replace(f, 'dobl____'+str(no))
-                # line = line.replace(f, '<span style="color: green">'+f+'</span>')
+        sngl, dobl, line = escape_user_strings(line)
 
         # escape unicode characters including space char &nbsp;
         line = escape_unicode(line)
@@ -437,7 +442,7 @@ class Pyvoc():
 
         # put back stuff remove because of special chars parsing
         line = put_back_unicode(line)
-        line = self._put_strings_back(sngl, dobl, line)
+        line = put_back_user_strings(sngl, dobl, line)
 
         return line
 

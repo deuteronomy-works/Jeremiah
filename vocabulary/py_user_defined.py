@@ -78,7 +78,6 @@ class UserDefined():
 
         remain = splits[1].split('(')
         name = remain[0]
-        print('rem: ', remain)
         value_str = remain[1].split(')')[0]
 
         if ' ' in value_str:
@@ -104,6 +103,7 @@ class UserDefined():
                     self.functions_parent[class_name] = [name]
                     self.variables[class_name] = [{name: []}]
                     self.functions.append(name)
+
         return name, values
 
     def _parse_imports(self, line):

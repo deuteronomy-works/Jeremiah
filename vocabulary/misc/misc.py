@@ -23,6 +23,11 @@ def add_splitter(splits, splitter):
 
     return restruct
 
+def escape_html_metachars(word):
+    html_metachars = {'&': 'amp;', '<': '&lt;', '>': '&gt;', '"': 'quot;'}
+    for entity in html_metachars:
+        word = word.replace(entity, html_metachars[entity])
+    return word
 
 def escape_unicode(line):
     unicode = {'&nbsp;': '_space__uni_code'}
@@ -69,15 +74,18 @@ def put_back_user_strings(sngl, dobl, line):
     no = -1
     for f in sngl:
         no += 1
+        # escape html chars
+        esc_sngl = escape_html_metachars(sngl[no])
         line = line.replace('sngl____'+str(no),
-                            "<span style='color: #46c28e'>"+sngl[no]+"</span>")
+                            "<span style='color: #46c28e'>"+esc_sngl+"</span>")
 
     # double
     no = -1
     for f in dobl:
         no += 1
+        esc_dobl = escape_html_metachars(dobl[no])
         line = line.replace('dobl____'+str(no),
-                            "<span style='color: #46c28e'>"+dobl[no]+"</span>")
+                            "<span style='color: #46c28e'>"+esc_dobl+"</span>")
 
     return line
 

@@ -29,6 +29,9 @@ class SplitParenthesis():
     def _find_par(self, worde, w_ind):
 
         for x in self.parenthesis:
+            # do not split span
+            if '<span' in worde:
+                break
             if x in worde and x != worde:
                 d = self._spliter(worde, x)
                 self.data.pop(w_ind)
