@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from vocabulary.misc.misc import escape_user_strings, put_back_user_strings
+import re
+from vocabulary.misc.misc import escape_user_strings, put_back_user_strings, escape_user_comments, put_back_user_comments
 
 
 class UserDefined():
@@ -27,21 +28,25 @@ class UserDefined():
         no = -1
         for line in lines:
             sngl, dobl, line = escape_user_strings(line)
+            sgnl_com, dobl_com, line = escape_user_comments(line)
             no += 1
-            if 'import ' in line:
+            if re.findall(r'\bimport\b', line):
                 self._parse_imports(line)
-            if 'class ' in line:
+            if re.findall(r'\bclass\b', line):
                 self.curr_type = 'class'
                 self._parse_classes(line)
-            elif 'def ' in line:
+            elif re.findall(r'\bdef\b', line):
                 self.curr_type = 'def'
                 name, values = self._parse_function(line)
             elif '=' in line:
                 self._parse_prop(line)
+            line = put_back_user_comments(sgnl_com, dobl_com, line)
             line = put_back_user_strings(sngl, dobl, line)
 
     def _parse_classes(self, line):
+        print('class line: ', line)
         splits = line.split('class ')
+        print('splits: ', splits)
         spaces = splits[0]
         remain = splits[1]
         if '(' in remain:

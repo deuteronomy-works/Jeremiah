@@ -2,10 +2,11 @@
 import re
 from vocabulary.py_user_defined import UserDefined
 from vocabulary.types.base import base_types, base_types_dict, base_operand,\
-base_operand_repl, base_functions,base_func_dict
+base_operand_repl, base_functions,base_func_dict, base_types_repl
 from vocabulary.types.user_defined import user_func_dict
 from vocabulary.types.referenced import ref_prop_name
-from vocabulary.misc.misc import add_splitter, fix_span_stat, escape_unicode, put_back_unicode, escape_user_strings, put_back_user_strings
+from vocabulary.misc.misc import add_splitter, fix_span_stat, escape_unicode,\
+put_back_unicode, escape_user_strings, put_back_user_strings, escape_user_comments
 from vocabulary.misc.misc_py import SplitParenthesis
 
 class Pyvoc():
@@ -13,8 +14,8 @@ class Pyvoc():
 
     def __init__(self, conts):
         self.content = conts
-        self.base_types = base_types
-        self.base_types_dict = base_types_dict
+        self.base_types = base_types_repl
+        self.base_types_dict = base_types_repl
         self.operand_types = ['+', '-', '=', '/', '*']
         self.escape_parentesis = ['[', ']', '{', '}', '(', ')']
         self.space_char = " "
@@ -48,7 +49,6 @@ class Pyvoc():
     def finder(self, name, c_type=None, c_class=None, c_func=None, p_indent=0):
         print('finder: ', name, len(name))
         print('c_class: ', c_type, c_class, c_func)
-        print('var: ', self.variables)
 
         # check name
         if not name:
@@ -106,8 +106,6 @@ class Pyvoc():
         return
 
     def main_parser(self, content):
-
-        print('variables: ', self.variables)
         
         lines = content.split('\r\n')
         self.r_lines_len = len(lines)
@@ -226,11 +224,14 @@ class Pyvoc():
 
     def _parse_props(self, line):
 
+        sngl, dobl, line = escape_user_strings(line)
+        sgnl_com, dobl_com, line = escape_user_comments(line)
+
         sp_splits = line.split(' ')
         main_splits = [b for b in sp_splits if b != '']
 
         # find class
-        if 'class ' in line:
+        if re.findall(r'\bclass\b', line):
             self.curr_type = 'class'
             splits = line.split('class ')
             a_split = splits[0]
@@ -250,6 +251,9 @@ class Pyvoc():
 
         # find def
         if 'def' in main_splits:
+            print('\n', '*************')
+            print('parse_props: ', main_splits)
+            print('\n', '********%%%%%%%%%%%%%%%%')
             self.curr_type = 'def'
             splits = line.split('def ')
             a_split = splits[0]
@@ -513,7 +517,7 @@ class Pyvoc():
         for x in var:
             if x in splits:
                 ind = splits.index(x)
-                splits[ind] = var_dict[x]
+                splits[ind] = var_dict.format(x)
 
         # Add all to string
         string = ""

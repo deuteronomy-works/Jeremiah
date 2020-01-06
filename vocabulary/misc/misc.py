@@ -38,8 +38,30 @@ def escape_unicode(line):
     return line
 
 
+def escape_user_comments(line):
+    found = re.findall(r'#.*.*.*', line)
+    sngl = []
+    if found:
+        no = -1
+        for f in found:
+            no += 1
+            sngl.append(f)
+            line = line.replace(f, 'sngl_com____'+str(no))
+
+    found = re.findall(r'""".*?.*?.*?"""', line)
+    dobl = []
+    if found:
+        no = -1
+        for f in found:
+            no += 1
+            dobl.append(f)
+            line = line.replace(f, 'dobl_com____'+str(no))
+
+    return sngl, dobl, line
+
+
 def escape_user_strings(line):
-    found = re.findall(r'".*?.*?"', line)
+    found = re.findall(r'".*?.*?.*?"', line)
     sngl = []
     if found:
         no = -1
@@ -48,7 +70,7 @@ def escape_user_strings(line):
             sngl.append(f)
             line = line.replace(f, 'sngl____'+str(no))
 
-    found = re.findall(r"'.*?.*?'", line)
+    found = re.findall(r"'.*?.*?.*?'", line)
     dobl = []
     if found:
         no = -1
@@ -65,6 +87,24 @@ def put_back_unicode(line):
     
     for word in words:
         line = line.replace(word, words[word])
+
+    return line
+
+
+def put_back_user_comments(sngl, dobl, line):
+    # single
+    no = -1
+    for f in sngl:
+        no += 1
+        esc_sngl = sngl[no]
+        line = line.replace('sngl_com____'+str(no), esc_sngl)
+
+    # double
+    no = -1
+    for f in dobl:
+        no += 1
+        esc_dobl = dobl[no]
+        line = line.replace('dobl_com____'+str(no), esc_dobl)
 
     return line
 
