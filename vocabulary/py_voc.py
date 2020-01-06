@@ -164,8 +164,8 @@ class Pyvoc():
             sp_splits = re.split('<span.*?.*?.*?=\s?</span>', line)
 
             # find those used in brackets
-            new_splits = self._find_props_in_brac(sp_splits)
             main_splits = self._separ([sp_splits[-1]])
+            print('main: ', main_splits)
             """a = new_splits[-1].split(' ')
             # remove empty space chars and commas
             b = [pick.replace(',', '') for pick in a if pick != '' and pick != ',']
