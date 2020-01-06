@@ -21,6 +21,8 @@ class Pyvoc():
         self.escape_parentesis = ['[', ']', '{', '}', '(', ')']
         self.space_char = " "
         self.replace_processes = ['spaceless', 'base']
+        self.sgnl = []
+        self.dobl = []
         self.lines = []
         self.r_lines_len = 0
         self.curr_type = None
@@ -263,8 +265,15 @@ class Pyvoc():
         if not line:
             return line
 
+        sgnl_com, dobl_com, line = escape_user_comments(line)
+        self.sngl, self.dobl, line = escape_user_strings(line)
+
         for var in self.replace_processes:
             line = self._replace(var, line)
+
+        line = put_back_user_strings(self.sngl, self.dobl, line)
+        line = put_back_user_comments(sgnl_com, dobl_com, line)
+
         return line
 
     def _separ(self, splits):
@@ -426,7 +435,7 @@ class Pyvoc():
         return lister
 
     def _replace(self, var, line):
-
+        
         if var == 'base':
             main_var = self.base_types
             main_dict = self.base_types_dict
@@ -451,9 +460,6 @@ class Pyvoc():
 
     def _replace_spaceless_var(self, main_var, main_dict, line):
 
-        sngl, dobl, line = escape_user_strings(line)
-        print('1: ', line)
-
         # escape unicode characters including space char &nbsp;
         line = escape_unicode(line)
         print('2: ', line)
@@ -469,17 +475,10 @@ class Pyvoc():
         # put back stuff remove because of special chars parsing
         line = put_back_unicode(line)
         print('4: ', line)
-        line = put_back_user_strings(sngl, dobl, line)
-        print('5: ', line)
 
         return line
 
     def _replace_space_var(self, var, var_dict, line):
-
-        sngl, dobl, line = escape_user_strings(line)
-        print('6: ', line)
-        sgnl_com, dobl_com, line = escape_user_comments(line)
-        print('7: ', line)
 
         splits = line.split(' ')
 
@@ -498,11 +497,6 @@ class Pyvoc():
 
         # fix escape for less and greater than symbols
         line = fix_span_stat(line)
-        print('8: ', line)
-        line = put_back_user_comments(sgnl_com, dobl_com, line)
-        print('9: ', line)
-        line = put_back_user_strings(sngl, dobl, line)
-        print('10: ', line)
 
         return line
 
