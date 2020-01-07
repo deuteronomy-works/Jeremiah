@@ -57,8 +57,9 @@ def escape_user_comments(line):
         no = -1
         for f in found:
             no += 1
-            dobl.append(f)
             line = line.replace(f, 'jeride__dobl_com____'+str(no))
+            f = f.replace('\r\n', '\u2029')
+            dobl.append(f)
 
     return sngl, dobl, line
 
