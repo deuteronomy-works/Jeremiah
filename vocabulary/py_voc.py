@@ -39,14 +39,10 @@ class Pyvoc():
         user_def = UserDefined(self.content)
         self.content = user_def.start()
         self.variables = user_def.variables
-        print('self: ', self.content)
         sgnl_com, dobl_com, self.content = escape_user_comments(self.content)
-        print('comm: ', sgnl_com, dobl_com, self.content)
         self._sanitise_quotes()
         self._replace_all_space()
         self._unsanitise_quotes()
-        print('sng: ', sgnl_com, dobl_com, self.content)
-
         self.main_parser(self.content)
 
         self.content = self.rebuild_content()
@@ -335,6 +331,8 @@ class Pyvoc():
             no += 1
             if word.startswith('<span'):
                 pass
+            elif word.startswith('jeride__'):
+                print('jer stuff')
             elif self._is_string(word):
                 word_splits_s[no] = word
             elif word == "\u2029":
