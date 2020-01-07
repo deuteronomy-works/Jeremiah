@@ -29,8 +29,9 @@ def escape_html_metachars(word):
         word = word.replace(entity, html_metachars[entity])
     return word
 
+
 def escape_unicode(line):
-    unicode = {'&nbsp;': '_space__uni_code'}
+    unicode = {'&nbsp;': 'jeride__space__uni_code'}
     
     for code in unicode:
         line = line.replace(code, unicode[code])
@@ -46,16 +47,18 @@ def escape_user_comments(line):
         for f in found:
             no += 1
             sngl.append(f)
-            line = line.replace(f, 'sngl_com____'+str(no))
+            line = line.replace(f, 'jeride__sngl_com____'+str(no))
 
-    found = re.findall(r'""".*?.*?.*?"""', line)
+    # replace double quote first
+    line = line.replace('"""', 'jeride_comm__ent')
+    found = re.findall(r'jeride_comm__ent\r\n*.*.*.*\r\n*jeride_comm__ent', line)
     dobl = []
     if found:
         no = -1
         for f in found:
             no += 1
             dobl.append(f)
-            line = line.replace(f, 'dobl_com____'+str(no))
+            line = line.replace(f, 'jeride__dobl_com____'+str(no))
 
     return sngl, dobl, line
 
@@ -68,7 +71,7 @@ def escape_user_strings(line):
         for f in found:
             no += 1
             sngl.append(f)
-            line = line.replace(f, 'sngl____'+str(no))
+            line = line.replace(f, 'jeride__sngl____'+str(no))
 
     found = re.findall(r"'.*?.*?.*?'", line)
     dobl = []
@@ -77,13 +80,13 @@ def escape_user_strings(line):
         for f in found:
             no += 1
             dobl.append(f)
-            line = line.replace(f, 'dobl____'+str(no))
+            line = line.replace(f, 'jeride__dobl____'+str(no))
 
     return sngl, dobl, line
 
 
 def put_back_unicode(line):
-    words = {'_space__uni_code': '&nbsp;'}
+    words = {'jeride__space__uni_code': '&nbsp;'}
     
     for word in words:
         line = line.replace(word, words[word])
@@ -97,14 +100,20 @@ def put_back_user_comments(sngl, dobl, line):
     for f in sngl:
         no += 1
         esc_sngl = sngl[no]
-        line = line.replace('sngl_com____'+str(no), esc_sngl)
+        span_stat = "<span style='color: #D79FB3'>"+esc_sngl+"</span>"
+        line = line.replace('jeride__sngl_com____'+str(no), span_stat)
 
     # double
     no = -1
     for f in dobl:
         no += 1
         esc_dobl = dobl[no]
-        line = line.replace('dobl_com____'+str(no), esc_dobl)
+        span_stat = "<span style='color: #D79FB3'>"+esc_dobl+"</span>"
+        line = line.replace('jeride__dobl_com____'+str(no), span_stat)
+
+    # put back escaped triple quotes
+    line = line.replace('jeride_comm__ent', '"""')
+    print('linea: ', line)
 
     return line
 
