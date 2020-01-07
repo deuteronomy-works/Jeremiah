@@ -19,7 +19,7 @@ class Pyvoc():
         self.base_types_dict = base_types_repl
         self.operand_types = ['+', '-', '=', '/', '*']
         self.escape_parentesis = ['[', ']', '{', '}', '(', ')']
-        self.space_char = " "
+        self.space_char = "&nbsp;"
         self.replace_processes = ['spaceless', 'base']
         self.sgnl = []
         self.dobl = []
@@ -39,12 +39,19 @@ class Pyvoc():
         user_def = UserDefined(self.content)
         self.content = user_def.start()
         self.variables = user_def.variables
-        #self._sanitise_quotes()
-        # self._replace_all_space()
+        print('self: ', self.content)
+        sgnl_com, dobl_com, self.content = escape_user_comments(self.content)
+        print('comm: ', sgnl_com, dobl_com, self.content)
+        self._sanitise_quotes()
+        self._replace_all_space()
+        self._unsanitise_quotes()
+        print('sng: ', sgnl_com, dobl_com, self.content)
 
         self.main_parser(self.content)
 
         self.content = self.rebuild_content()
+        self.content = put_back_user_comments(sgnl_com, dobl_com, self.content)
+        print(self.content)
         #self._unsanitise_quotes()
 
         return self.content
@@ -107,7 +114,7 @@ class Pyvoc():
         return
 
     def main_parser(self, content):
-        
+
         lines = content.split('\r\n')
         self.r_lines_len = len(lines)
 
@@ -186,7 +193,7 @@ class Pyvoc():
                 if found:
                     # mark
                     line = line.replace(found, ref_prop_name['baz'].format(found))
-
+        print('here go: ', line)
         return line
 
     def _find_props_in_brac(self, raw_list):
@@ -210,7 +217,6 @@ class Pyvoc():
     def _parse_props(self, line):
 
         sngl, dobl, line = escape_user_strings(line)
-        sgnl_com, dobl_com, line = escape_user_comments(line)
 
         sp_splits = line.split(' ')
         main_splits = [b for b in sp_splits if b != '']
@@ -218,7 +224,7 @@ class Pyvoc():
         # find class
         if re.findall(r'\bclass\b', line):
             self.curr_type = 'class'
-            splits = line.split('class ')
+            splits = line.split('class'+self.space_char)
             a_split = splits[0]
 
             indent = 0
@@ -265,14 +271,12 @@ class Pyvoc():
         if not line:
             return line
 
-        sgnl_com, dobl_com, line = escape_user_comments(line)
         self.sngl, self.dobl, line = escape_user_strings(line)
 
         for var in self.replace_processes:
             line = self._replace(var, line)
 
         line = put_back_user_strings(self.sngl, self.dobl, line)
-        line = put_back_user_comments(sgnl_com, dobl_com, line)
 
         return line
 
@@ -462,7 +466,6 @@ class Pyvoc():
 
         # escape unicode characters including space char &nbsp;
         line = escape_unicode(line)
-        print('2: ', line)
 
         for x in main_var:
             if x in line and '"'+x+'"' not in line and "'"+x+"'" not in line:
@@ -470,11 +473,9 @@ class Pyvoc():
 
         # fix escape for less and greater than symbols
         line = fix_span_stat(line)
-        print('3: ', line)
 
         # put back stuff remove because of special chars parsing
         line = put_back_unicode(line)
-        print('4: ', line)
 
         return line
 
