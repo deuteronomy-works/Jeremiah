@@ -36,18 +36,19 @@ class Pyvoc():
     def start(self):
 
         # Find user defined
+        sgnl_com, dobl_com, self.content = escape_user_comments(self.content)
+
         user_def = UserDefined(self.content)
         self.content = user_def.start()
         self.variables = user_def.variables
-        sgnl_com, dobl_com, self.content = escape_user_comments(self.content)
         self._sanitise_quotes()
         self._replace_all_space()
         self._unsanitise_quotes()
         self.main_parser(self.content)
 
         self.content = self.rebuild_content()
+        print('self content: ', self.content)
         self.content = put_back_user_comments(sgnl_com, dobl_com, self.content)
-        print(self.content)
         #self._unsanitise_quotes()
 
         return self.content
@@ -168,7 +169,6 @@ class Pyvoc():
 
             # find those used in brackets
             main_splits = self._separ([sp_splits[-1]])
-            print('main: ', main_splits)
             """a = new_splits[-1].split(' ')
             # remove empty space chars and commas
             b = [pick.replace(',', '') for pick in a if pick != '' and pick != ',']
@@ -189,7 +189,7 @@ class Pyvoc():
                 if found:
                     # mark
                     line = line.replace(found, ref_prop_name['baz'].format(found))
-        print('here go: ', line)
+
         return line
 
     def _find_props_in_brac(self, raw_list):
@@ -332,7 +332,7 @@ class Pyvoc():
             if word.startswith('<span'):
                 pass
             elif word.startswith('jeride__'):
-                print('jer stuff')
+                pass
             elif self._is_string(word):
                 word_splits_s[no] = word
             elif word == "\u2029":

@@ -40,14 +40,19 @@ def escape_unicode(line):
 
 
 def escape_user_comments(line):
-    found = re.findall(r'#.*.*.*', line)
+    found = re.findall(r'#.*.*.*\r\n?', line)
+    print('f: ', found)
     sngl = []
     if found:
         no = -1
         for f in found:
             no += 1
+            jeride_no = 'jeride__sngl_com____'+str(no)
+            line = line.replace(f, jeride_no)
+            f = f.replace('\r\n', '\u2029')
             sngl.append(f)
-            line = line.replace(f, 'jeride__sngl_com____'+str(no))
+            
+            print('esc no: ', no, jeride_no, sngl[no])
 
     # replace double quote first
     line = line.replace('"""', 'jeride_comm__ent')
@@ -57,9 +62,11 @@ def escape_user_comments(line):
         no = -1
         for f in found:
             no += 1
-            line = line.replace(f, 'jeride__dobl_com____'+str(no))
+            jeride_no = 'jeride__dobl_com____'+str(no)
+            line = line.replace(f, jeride_no)
             f = f.replace('\r\n', '\u2029')
             dobl.append(f)
+            print('double esc no: ', no, jeride_no, dobl[no])
 
     return sngl, dobl, line
 
@@ -100,21 +107,28 @@ def put_back_user_comments(sngl, dobl, line):
     no = -1
     for f in sngl:
         no += 1
-        esc_sngl = sngl[no]
+        esc_sngl = f
+        print('f: ', f)
         span_stat = "<span style='color: #D79FB3'>"+esc_sngl+"</span>"
-        line = line.replace('jeride__sngl_com____'+str(no), span_stat)
+        print('span stat: ', span_stat)
+        jeride_no = 'jeride__sngl_com____'+ str(no)
+        line = line.replace(jeride_no, span_stat)
+        print('no: ', no, jeride_no, sngl[no])
 
     # double
     no = -1
     for f in dobl:
         no += 1
-        esc_dobl = dobl[no]
+        esc_dobl = f
+        print('f: ', f)
         span_stat = "<span style='color: #D79FB3'>"+esc_dobl+"</span>"
-        line = line.replace('jeride__dobl_com____'+str(no), span_stat)
+        print('span stat: ', span_stat)
+        jeride_no = 'jeride__dobl_com____' + str(no)
+        line = line.replace(jeride_no, span_stat)
+        print('double no: ', no, jeride_no, dobl[no])
 
     # put back escaped triple quotes
     line = line.replace('jeride_comm__ent', '"""')
-    print('linea: ', line)
 
     return line
 
