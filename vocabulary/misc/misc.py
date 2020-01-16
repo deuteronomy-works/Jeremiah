@@ -42,6 +42,7 @@ def escape_unicode(line):
 def escape_user_comments(line):
     found = re.findall(r'#.*.*.*\r\n?', line)
     print('f: ', found)
+    
     sngl = []
     if found:
         no = -1
@@ -107,9 +108,11 @@ def put_back_user_comments(sngl, dobl, line):
     no = -1
     for f in sngl:
         no += 1
-        esc_sngl = f
-        print('f: ', f)
-        span_stat = "<span style='color: #D79FB3'>"+esc_sngl+"</span>"
+        no_nl = len(re.findall('\u2029', f))
+        new_lines = '\u2029' * no_nl
+        esc_sngl = f.replace(new_lines, "</span>" + new_lines)
+        span_stat = "<span style='color: #D79FB3'>"+esc_sngl
+        
         print('span stat: ', span_stat)
         jeride_no = 'jeride__sngl_com____'+ str(no)
         line = line.replace(jeride_no, span_stat)
