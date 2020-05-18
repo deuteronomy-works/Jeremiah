@@ -108,9 +108,12 @@ def put_back_user_comments(sngl, dobl, line):
     no = -1
     for f in sngl:
         no += 1
-        no_nl = len(re.findall('\u2029', f))
-        new_lines = '\u2029' * no_nl
-        esc_sngl = f.replace(new_lines, "</span>" + new_lines)
+        if '\u2029' in f:
+            new_lines = '\u2029'
+            esc_sngl = f.replace(new_lines, "</span>" + new_lines)
+        else:
+            esc_sngl = f
+
         span_stat = "<span style='color: #D79FB3'>"+esc_sngl
         
         print('span stat: ', span_stat)
