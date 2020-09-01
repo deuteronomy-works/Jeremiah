@@ -12,15 +12,60 @@ ApplicationWindow {
     color: "#f1f1f1"
     flags: Qt.FramelessWindowHint | Qt.Window
 
-    Component.onCompleted: {
-        Connector.startUp()
-    }
+
+    // Application
+    property int current_tab: 0
+    property QtObject tab_view
+    property QtObject tab_bar
+    property var textComp: []
+    property var tab_headers: ["First Layout"]
+
+    // Editor
+    property string word
+    property var breaks: []
+    property string words: ""
+    property string prop_text: ""
+    property int tab_width: 0
+
+    // FileSystem
+    property var file_names: ["First Layout"]
+    property string opening_file: ""
+    property url cwd
+    property bool saved: false
+    property string full_text
+
+    // Runner
+    property bool sing_running
+    property bool project_running
+
 
     // Application
     signal createNewTab()
     signal startNewDocument(string file_contents)
     signal updateList(int pos, int ind, string value)
 
+    // Editor
+    signal spacePressed(string full_text, string curr_char, string line, int cur_pos, var ln_breaks)
+    signal enterPressed(string full_text,int cur_pos)
+    signal charPressed(string full_text, string curr_char, string line, int cur_pos, var ln_breaks)
+    signal backspacePressed(string some_text, int cur_pos)
+    signal tabPressed(string some_text, int cur_pos, bool pure)
+    signal mousePressed(int cur_pos)
+    signal count()
+
+    // FileSystem
+    signal openBtnPressed()
+    signal openFile(string file)
+    signal updateFileName(string file)
+    signal saveBtnPressed(string fulltext)
+    signal save(string filename)
+
+    // Runner
+    signal runSingleFile()
+    signal runProject()
+
+
+    // Application
     onCreateNewTab: {
         tab_view.addChild('../TextComponent.qml', tab_bar, 'tv')
     }
@@ -60,42 +105,9 @@ ApplicationWindow {
 
     }
 
-    // Editor
-    signal spacePressed(string full_text, string curr_char, string line, int cur_pos, var ln_breaks)
-    signal enterPressed(string full_text,int cur_pos)
-    signal charPressed(string full_text, string curr_char, string line, int cur_pos, var ln_breaks)
-    signal backspacePressed(string some_text, int cur_pos)
-    signal tabPressed(string some_text, int cur_pos, bool pure)
-    signal mousePressed(int cur_pos)
-    signal count()
-
-    // FileSystem
-    signal openBtnPressed()
-    signal openFile(string file)
-    signal updateFileName(string file)
-    signal saveBtnPressed(string fulltext)
-    signal save(string filename)
-
-    // Application
-    property int current_tab: 0
-    property QtObject tab_view
-    property QtObject tab_bar
-    property var textComp: []
-    property var tab_headers: ["First Layout"]
-
-    // Editor
-    property string word
-    property var breaks: []
-    property string words: ""
-    property string prop_text: ""
-    property int tab_width: 0
-
-    // FileSystem
-    property var file_names: ["First Layout"]
-    property string opening_file: ""
-    property url cwd
-    property bool saved: false
-    property string full_text
+    Component.onCompleted: {
+        Connector.startUp()
+    }
 
     // Editor
     onSpacePressed: {
@@ -127,7 +139,6 @@ ApplicationWindow {
         var tComp = textComp[current_tab]
         Connector.editor_count(tComp.getText(0, tComp.length), tComp.cursor_position)
     }
-
 
     // FileSystem
     onOpenBtnPressed: {
@@ -164,6 +175,18 @@ ApplicationWindow {
         Connector.save_file(filename, full_text)
     }
 
+    // Runner
+    onRunSingleFile: {
+        var fileName = file_names[current_tab];
+        Connector.run_single_file(fileName);
+    }
+
+    onRunProject: {
+        Connector.run_project(mainFile);
+    }
+
+
+
     FontLoader {
         id: font_mat
         source: "fonts/materialdesignicons-webfont.ttf"
@@ -178,77 +201,7 @@ ApplicationWindow {
         height: 36
         color: "transparent"
 
-        ToolBar {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.leftMargin: 8
-            anchors.rightMargin: 12
-            //width: parent.width
-            height: 36
-
-            background: Rectangle {
-                color: 'transparent'
-            }
-
-            RowLayout {
-                height: parent.height
-
-                Cust.CustToolButton {
-                    Layout.preferredHeight: 24
-                    text: settings.add_f_icon
-                }
-
-                Cust.CustToolButton {
-                    Layout.preferredHeight: 24
-                    text: settings.save_icon
-                }
-
-                Cust.CustToolButton {
-                    Layout.preferredHeight: 24
-                    text: settings.save_all_icon
-                }
-
-                Cust.CustToolSeparator {}
-
-                Cust.CustToolButton {
-                    Layout.preferredHeight: 24
-                    text: settings.undo_icon
-                }
-
-                Cust.CustToolButton {
-                    Layout.preferredHeight: 24
-                    text: settings.redo_icon
-                }
-
-                Cust.CustToolSeparator {}
-
-                Cust.CustomComboBox {
-                    model: Comp.FreezerModel {}
-                }
-
-                Cust.CustomComboBox {
-                    model: Comp.RunPlatformModel {}
-                }
-
-                Cust.CustomComboBox {
-                    model: Comp.RunTypeModel {}
-                }
-
-                Cust.CustToolSeparator {}
-
-                Cust.CustToolButton {
-                    Layout.preferredHeight: 24
-                    text: settings.run_icon
-                }
-
-                Cust.CustToolButton {
-                    Layout.preferredHeight: 24
-                    text: settings.run_icon
-                }
-
-
-            }
-        }
+        Comp.Toolbar {}
 
     }
 
@@ -275,10 +228,16 @@ ApplicationWindow {
                     Layout.fillHeight: true
                 }
 
-
-                Comp.PropertiesBlock {
+                Rectangle {
                     Layout.preferredWidth: main_content_rect.width / 4
                     Layout.fillHeight: true
+                    border.color: "#45777777"
+                    /*Comp.PropertiesBlock {
+                        Layout.preferredWidth: main_content_rect.width / 4
+                        Layout.fillHeight: true
+                        visible: false
+                    }*/
+
                 }
 
 
@@ -309,6 +268,7 @@ ApplicationWindow {
 
     Comp.OpenDialog { id: o_Dialog }
     Comp.SaveDialog { id: s_Dialog }
+
 
     Connections {
         target: Connector

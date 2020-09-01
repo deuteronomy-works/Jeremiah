@@ -58,7 +58,8 @@ class Fs():
         filename =  self._clean_filename(file_name)
         cleaned = self._clean_content(contents)
 
-        #self.check_vocabulary(cleaned)
+        # Do not check vocabulary
+        # self.check_vocabulary(cleaned)
 
         data = bytes(cleaned, 'utf-8')
         with open(filename, 'wb') as f:
